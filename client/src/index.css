@@ -207,6 +207,12 @@ select:focus {
   color: var(--color-danger);
 }
 
+.alert-success {
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent-hover);
+}
+
 /* badges */
 .badge {
   display: inline-flex;
@@ -286,6 +292,20 @@ select:focus {
   border-width: 2px;
 }
 
+.seat-selectable {
+  cursor: pointer;
+}
+
+.seat-selectable:hover {
+  border-color: var(--color-accent);
+}
+
+.seat-selected {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #ffffff;
+}
+
 .seat-legend {
   display: flex;
   flex-wrap: wrap;
@@ -304,4 +324,27 @@ select:focus {
 .seat-legend .seat {
   width: 16px;
   height: 16px;
+}
+
+/* reservation forms */
+.reservation-section {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.reservation-forms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+}
+
+.reservation-form {
+  flex: 1;
+  min-width: 240px;
+}
+
+.reservation-form h2 {
+  font-size: var(--font-size-lg);
+  margin: 0 0 var(--space-2);
 }

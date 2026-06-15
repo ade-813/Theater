@@ -3,13 +3,18 @@ import Navbar from '../components/Navbar'
 import SeatMap from '../components/SeatMap'
 import { AuthContext } from '../context/AuthContext'
 import { getSeats } from '../api/seats'
-import { getReservations } from '../api/reservations'
+import { getReservations, createReservation } from '../api/reservations'
 
 function Home() {
   const { user, loading } = useContext(AuthContext)
   const [seats, setSeats] = useState([])
   const [reservations, setReservations] = useState([])
   const [error, setError] = useState('')
+  const [selectedSeatIds, setSelectedSeatIds] = useState(new Set())
+  const [feedback, setFeedback] = useState(null)
+  const [count, setCount] = useState('1')
+  const [category, setCategory] = useState('normal')
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     getSeats()
@@ -32,13 +37,126 @@ function Home() {
     return ids
   }, [user, reservations])
 
+  const toggleSeat = (seat) => {
+    setSelectedSeatIds((current) => {
+      const next = new Set(current)
+      if (next.has(seat.id)) next.delete(seat.id)
+      else next.add(seat.id)
+      return next
+    })
+  }
+
+  const refreshAfterReservation = () => {
+    getSeats().then(setSeats).catch(() => setError('Unable to load the seat map'))
+    getReservations().then(setReservations).catch(() => setReservations([]))
+  }
+
+  const handleReservationError = (err) => {
+    setFeedback({ type: 'error', text: err.response?.data?.error || 'Unable to complete the reservation' })
+  }
+
+  const handleSelectionSubmit = (event) => {
+    event.preventDefault()
+    if (selectedSeatIds.size === 0) return
+    setSubmitting(true)
+    createReservation({ seatIds: [...selectedSeatIds] })
+      .then(() => {
+        setFeedback({ type: 'success', text: 'Reservation created' })
+        setSelectedSeatIds(new Set())
+        refreshAfterReservation()
+      })
+      .catch(handleReservationError)
+      .finally(() => setSubmitting(false))
+  }
+
+  const handleCategorySubmit = (event) => {
+    event.preventDefault()
+    const n = Number(count)
+    if (!Number.isInteger(n) || n <= 0) {
+      setFeedback({ type: 'error', text: 'Enter a positive number of seats' })
+      return
+    }
+    setSubmitting(true)
+    createReservation({ count: n, category })
+      .then(() => {
+        setFeedback({ type: 'success', text: `Reserved ${n} ${category} seat(s)` })
+        refreshAfterReservation()
+      })
+      .catch(handleReservationError)
+      .finally(() => setSubmitting(false))
+  }
+
   return (
     <>
       <Navbar />
       <main className="page page-wide">
         <h1>Theater seat map</h1>
         {error && <p className="alert alert-error">{error}</p>}
-        <SeatMap seats={seats} ownSeatIds={ownSeatIds} />
+        {feedback && (
+          <p className={`alert ${feedback.type === 'error' ? 'alert-error' : 'alert-success'}`}>
+            {feedback.text}
+          </p>
+        )}
+        <SeatMap
+          seats={seats}
+          ownSeatIds={ownSeatIds}
+          selectedSeatIds={selectedSeatIds}
+          onSeatClick={user ? toggleSeat : undefined}
+        />
+
+        {user ? (
+          <div className="reservation-section">
+            <div className="reservation-forms">
+              <form className="reservation-form" onSubmit={handleSelectionSubmit}>
+                <h2>Reserve selected seats</h2>
+                <p className="text-muted">
+                  {selectedSeatIds.size === 0
+                    ? 'Click available seats on the map to select them.'
+                    : `${selectedSeatIds.size} seat(s) selected.`}
+                </p>
+                <div className="btn-row">
+                  <button type="submit" className="btn btn-primary" disabled={selectedSeatIds.size === 0 || submitting}>
+                    Reserve selected seats
+                  </button>
+                  <button
+                    type="button"
+                    className="btn"
+                    onClick={() => setSelectedSeatIds(new Set())}
+                    disabled={selectedSeatIds.size === 0}
+                  >
+                    Clear selection
+                  </button>
+                </div>
+              </form>
+
+              <form className="reservation-form" onSubmit={handleCategorySubmit}>
+                <h2>Assign seats by category</h2>
+                <div className="field">
+                  <label htmlFor="seat-count">Number of seats</label>
+                  <input
+                    id="seat-count"
+                    type="number"
+                    min="1"
+                    value={count}
+                    onChange={(event) => setCount(event.target.value)}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="seat-category">Category</label>
+                  <select id="seat-category" value={category} onChange={(event) => setCategory(event.target.value)}>
+                    <option value="normal">Normal</option>
+                    <option value="premium">Premium</option>
+                  </select>
+                </div>
+                <button type="submit" className="btn btn-primary" disabled={submitting}>
+                  Reserve
+                </button>
+              </form>
+            </div>
+          </div>
+        ) : (
+          <p className="text-muted">Log in to make a reservation.</p>
+        )}
       </main>
     </>
   )

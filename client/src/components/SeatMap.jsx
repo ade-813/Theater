@@ -41,7 +41,7 @@ function seatCurveOffset(seatIndex, rowLength, rowIndex) {
   return (distance * distance) / (2 * radius)
 }
 
-function SeatMap({ seats, ownSeatIds = new Set() }) {
+function SeatMap({ seats, ownSeatIds = new Set(), selectedSeatIds = new Set(), onSeatClick }) {
   if (seats.length === 0) return <p className="text-muted">Loading seat map...</p>
 
   // Render back-to-front (H..A): the curve/stairs grow with row index, so
@@ -59,16 +59,35 @@ function SeatMap({ seats, ownSeatIds = new Set() }) {
         >
           <span className="seat-row-label">{rowLabel}</span>
           <div className="seat-row-seats" style={{ paddingBottom: seatCurveOffset(0, rowSeats.length, rowIndex) }}>
-            {rowSeats.map((seat, seatIndex) => (
-              <div
-                key={seat.id}
-                className={`seat seat-${seatStatus(seat, ownSeatIds)}${seat.category === 'premium' ? ' seat-premium' : ''}`}
-                style={{ transform: `translateY(${seatCurveOffset(seatIndex, rowSeats.length, rowIndex)}px)` }}
-                title={`${seat.row}${seat.number} - ${seat.category}${seat.status === 'reserved' ? ', reserved' : ', available'}`}
-              >
-                {seat.number}
-              </div>
-            ))}
+            {rowSeats.map((seat, seatIndex) => {
+              const status = seatStatus(seat, ownSeatIds)
+              const selectable = Boolean(onSeatClick) && status === 'available'
+              const selected = selectedSeatIds.has(seat.id)
+              const classes = ['seat', `seat-${status}`]
+              if (seat.category === 'premium') classes.push('seat-premium')
+              if (selected) classes.push('seat-selected')
+              if (selectable) classes.push('seat-selectable')
+
+              return (
+                <div
+                  key={seat.id}
+                  className={classes.join(' ')}
+                  style={{ transform: `translateY(${seatCurveOffset(seatIndex, rowSeats.length, rowIndex)}px)` }}
+                  title={`${seat.row}${seat.number} - ${seat.category}${seat.status === 'reserved' ? ', reserved' : ', available'}`}
+                  role={selectable ? 'button' : undefined}
+                  tabIndex={selectable ? 0 : undefined}
+                  onClick={selectable ? () => onSeatClick(seat) : undefined}
+                  onKeyDown={selectable ? (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault()
+                      onSeatClick(seat)
+                    }
+                  } : undefined}
+                >
+                  {seat.number}
+                </div>
+              )
+            })}
           </div>
         </div>
       ))}
@@ -83,6 +102,11 @@ function SeatMap({ seats, ownSeatIds = new Set() }) {
         <span className="seat-legend-item">
           <span className="seat seat-own" aria-hidden="true" /> Your seat
         </span>
+        {onSeatClick && (
+          <span className="seat-legend-item">
+            <span className="seat seat-selected" aria-hidden="true" /> Selected
+          </span>
+        )}
         <span className="seat-legend-item">
           <span className="seat seat-available seat-premium" aria-hidden="true" /> Premium (thicker border)
         </span>
