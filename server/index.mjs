@@ -7,6 +7,7 @@ import passport from 'passport'
 import { seedIfEmpty } from './seed.mjs'
 import './auth.mjs'
 import sessionsRouter from './routes/sessions.mjs'
+import seatsRouter from './routes/seats.mjs'
 
 const app = express()
 const port = 3001
@@ -34,6 +35,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use('/api/sessions', sessionsRouter)
+app.use('/api/seats', seatsRouter)
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' })
