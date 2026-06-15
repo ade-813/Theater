@@ -14,9 +14,9 @@ function Home() {
   return (
     <>
       <Navbar />
-      <main>
+      <main className="page">
         <h1>Theater seat map</h1>
-        <p>API status: {apiStatus}</p>
+        <p className="text-muted">API status: {apiStatus}</p>
         {/* TODO: render seat map from GET /api/seats */}
       </main>
     </>

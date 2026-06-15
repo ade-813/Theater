@@ -2,7 +2,9 @@ import bcrypt from 'bcrypt'
 import dayjs from 'dayjs'
 import { dbReady, dbGet, dbRun } from './db.mjs'
 
-const TOTP_SECRET = process.env.TOTP_SECRET
+// Fallback matches server/.env.example — required so 2FA still works on a
+// fresh clone where .env (gitignored) is absent, per REQUIREMENTS.md.
+export const TOTP_SECRET = process.env.TOTP_SECRET || 'LXBSMDTMSP2I5XFXIYRGFVWSFI'
 
 // Theater layout: 8 rows, 5 distinct row lengths, rows A & B are premium.
 const ROWS = [
