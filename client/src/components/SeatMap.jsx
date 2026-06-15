@@ -41,7 +41,15 @@ function seatCurveOffset(seatIndex, rowLength, rowIndex) {
   return (distance * distance) / (2 * radius)
 }
 
-function SeatMap({ seats, ownSeatIds = new Set(), selectedSeatIds = new Set(), onSeatClick }) {
+function SeatMap({
+  seats,
+  ownSeatIds = new Set(),
+  selectedSeatIds = new Set(),
+  onSeatClick,
+  reservationMarkers = new Map(),
+  removableSeatIds = new Set(),
+  pendingRemoveSeatIds = new Set()
+}) {
   if (seats.length === 0) return <p className="text-muted">Loading seat map...</p>
 
   // Render back-to-front (H..A): the curve/stairs grow with row index, so
@@ -61,19 +69,30 @@ function SeatMap({ seats, ownSeatIds = new Set(), selectedSeatIds = new Set(), o
           <div className="seat-row-seats" style={{ paddingBottom: seatCurveOffset(0, rowSeats.length, rowIndex) }}>
             {rowSeats.map((seat, seatIndex) => {
               const status = seatStatus(seat, ownSeatIds)
-              const selectable = Boolean(onSeatClick) && status === 'available'
+              const inRemovable = removableSeatIds.has(seat.id)
+              const pendingRemove = pendingRemoveSeatIds.has(seat.id)
               const selected = selectedSeatIds.has(seat.id)
+              const selectable = Boolean(onSeatClick) && (status === 'available' || inRemovable)
+              const marker = reservationMarkers.get(seat.id)
+
               const classes = ['seat', `seat-${status}`]
               if (seat.category === 'premium') classes.push('seat-premium')
+              if (marker !== undefined && !inRemovable) classes.push(`seat-marker-${marker}`)
+              if (inRemovable) classes.push('seat-own')
+              if (pendingRemove) classes.push('seat-removing')
               if (selected) classes.push('seat-selected')
               if (selectable) classes.push('seat-selectable')
+
+              let title = `${seat.row}${seat.number} - ${seat.category}${seat.status === 'reserved' ? ', reserved' : ', available'}`
+              if (pendingRemove) title += ', marked for removal'
+              else if (selected) title += ', selected to add'
 
               return (
                 <div
                   key={seat.id}
                   className={classes.join(' ')}
                   style={{ transform: `translateY(${seatCurveOffset(seatIndex, rowSeats.length, rowIndex)}px)` }}
-                  title={`${seat.row}${seat.number} - ${seat.category}${seat.status === 'reserved' ? ', reserved' : ', available'}`}
+                  title={title}
                   role={selectable ? 'button' : undefined}
                   tabIndex={selectable ? 0 : undefined}
                   onClick={selectable ? () => onSeatClick(seat) : undefined}
@@ -99,9 +118,11 @@ function SeatMap({ seats, ownSeatIds = new Set(), selectedSeatIds = new Set(), o
         <span className="seat-legend-item">
           <span className="seat seat-reserved" aria-hidden="true" /> Reserved
         </span>
-        <span className="seat-legend-item">
-          <span className="seat seat-own" aria-hidden="true" /> Your seat
-        </span>
+        {ownSeatIds.size > 0 && (
+          <span className="seat-legend-item">
+            <span className="seat seat-own" aria-hidden="true" /> Your seat
+          </span>
+        )}
         {onSeatClick && (
           <span className="seat-legend-item">
             <span className="seat seat-selected" aria-hidden="true" /> Selected

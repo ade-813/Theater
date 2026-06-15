@@ -2,13 +2,13 @@
 
 ## Running the app
 
-```
+```bash
 cd server
 npm install
-npm run start
+node index.mjs --env-file=.env
 ```
 
-```
+```bash
 cd client
 npm install
 npm run dev
