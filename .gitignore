@@ -8,3 +8,4 @@ dist-ssr
 !.gitignore
 !README.md
 !.env.example
+*.db

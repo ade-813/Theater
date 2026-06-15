@@ -1,11 +1,15 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 import session from 'express-session'
 import passport from 'passport'
+import { seedIfEmpty } from './seed.mjs'
 
 const app = express()
 const port = 3001
+
+await seedIfEmpty()
 
 app.use(morgan('dev'))
 app.use(express.json())
