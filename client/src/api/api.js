@@ -7,10 +7,4 @@ const api = axios.create({
   withCredentials: true
 })
 
-const getHealth = async () => {
-  const response = await api.get('/health')
-  return response.data
-}
-
-export { getHealth }
 export default api
