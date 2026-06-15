@@ -24,7 +24,7 @@ app.use(
 
 app.use(
   session({
-    secret: 'theater-reservation-secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false
   })

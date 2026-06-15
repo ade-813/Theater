@@ -1,11 +1,12 @@
-# Server-side
+# Server
 
 ## API Routes
 
 ### Sessions
-- `POST /api/sessions` — body `{username, password}`, logs in via passport-local;
-  returns `{id, username, name, isAdmin, isTotpVerified}`
-- `GET /api/sessions/current` — returns the logged-in user (same shape as above) or 401
-- `DELETE /api/sessions/current` — logs out, destroys the session
-- `POST /api/sessions/totp` — body `{code}`, verifies the TOTP code against the
-  user's stored secret; on success sets `isTotpVerified: true` for the session
+
+| Method | Endpoint | Body | Returns |
+| --- | --- | --- | --- |
+| POST | `/api/sessions` | `{username, password}` | logs in via passport-local; `{id, username, name, isAdmin, isTotpVerified}` |
+| GET | `/api/sessions/current` | — | logged-in user (same shape as above) or 401 |
+| DELETE | `/api/sessions/current` | — | logs out, destroys the session |
+| POST | `/api/sessions/totp` | `{code}` | verifies the TOTP code against the user's stored secret; on success sets `isTotpVerified: true` for the session |
