@@ -20,8 +20,8 @@ function seatStatus(seat, ownSeatIds) {
   return seat.status === 'reserved' ? 'reserved' : 'available'
 }
 
-const SEAT_SIZE = 28
-const SEAT_GAP = 4
+const SEAT_SIZE = 32
+const SEAT_GAP = 6
 const SEAT_SPACING = SEAT_SIZE + SEAT_GAP
 
 // Theatral curve: seats further from a row's center are pushed down, away
@@ -110,28 +110,6 @@ function SeatMap({
           </div>
         </div>
       ))}
-
-      <div className="seat-legend">
-        <span className="seat-legend-item">
-          <span className="seat seat-available" aria-hidden="true" /> Available
-        </span>
-        <span className="seat-legend-item">
-          <span className="seat seat-reserved" aria-hidden="true" /> Reserved
-        </span>
-        {ownSeatIds.size > 0 && (
-          <span className="seat-legend-item">
-            <span className="seat seat-own" aria-hidden="true" /> Your seat
-          </span>
-        )}
-        {onSeatClick && (
-          <span className="seat-legend-item">
-            <span className="seat seat-selected" aria-hidden="true" /> Selected
-          </span>
-        )}
-        <span className="seat-legend-item">
-          <span className="seat seat-available seat-premium" aria-hidden="true" /> Premium (thicker border)
-        </span>
-      </div>
     </div>
   )
 }

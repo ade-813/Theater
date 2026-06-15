@@ -139,34 +139,74 @@ function Reservations() {
           </p>
         )}
 
-        {canManageOthers && (
-          <div className="field">
-            <label htmlFor="user-picker">Managing reservations for</label>
-            <select id="user-picker" value={viewedUserId} onChange={handleUserChange}>
-              <option value={user.id}>{user.name} (you)</option>
-              {users.filter((u) => u.id !== user.id).map((u) => (
-                <option key={u.id} value={u.id}>{u.name}</option>
-              ))}
-            </select>
+        <div className="layout">
+          <aside className="sidebar">
+            {canManageOthers && (
+              <div className="panel">
+                <h2 className="panel-title">Admin</h2>
+                <div className="field">
+                  <label htmlFor="user-picker">Managing reservations for</label>
+                  <select id="user-picker" value={viewedUserId} onChange={handleUserChange}>
+                    <option value={user.id}>{user.name} (you)</option>
+                    {users.filter((u) => u.id !== user.id).map((u) => (
+                      <option key={u.id} value={u.id}>{u.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            <div className="panel">
+              <h2 className="panel-title">Legend</h2>
+              <div className="seat-legend">
+                <span className="seat-legend-item">
+                  <span className="seat seat-available" aria-hidden="true" /> Available
+                </span>
+                <span className="seat-legend-item">
+                  <span className="seat seat-reserved" aria-hidden="true" /> Reserved
+                </span>
+                <span className="seat-legend-item">
+                  <span className="seat seat-available seat-premium" aria-hidden="true" /> Premium
+                </span>
+                {editingId !== null && (
+                  <>
+                    <span className="seat-legend-item">
+                      <span className="seat seat-own" aria-hidden="true" /> Editing
+                    </span>
+                    <span className="seat-legend-item">
+                      <span className="seat seat-selected" aria-hidden="true" /> To add
+                    </span>
+                    <span className="seat-legend-item">
+                      <span className="seat seat-removing" aria-hidden="true" /> To remove
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {editingId !== null && (
+              <div className="panel">
+                <h2 className="panel-title">Editing reservation #{editingId}</h2>
+                <p className="text-muted">
+                  {selectedSeatIds.size > 0 || removeSeatIds.size > 0
+                    ? `${selectedSeatIds.size} seat(s) to add, ${removeSeatIds.size} to remove.`
+                    : 'Click a highlighted seat to remove it, or an available seat to add it.'}
+                </p>
+              </div>
+            )}
+          </aside>
+
+          <div className="main-panel">
+            <SeatMap
+              seats={seats}
+              reservationMarkers={reservationMarkers}
+              removableSeatIds={removableSeatIds}
+              pendingRemoveSeatIds={removeSeatIds}
+              selectedSeatIds={selectedSeatIds}
+              onSeatClick={editingId !== null ? handleSeatClick : undefined}
+            />
           </div>
-        )}
-
-        {editingId !== null && (
-          <p className="text-muted">
-            {selectedSeatIds.size > 0 || removeSeatIds.size > 0
-              ? `${selectedSeatIds.size} seat(s) to add, ${removeSeatIds.size} to remove.`
-              : 'Click a highlighted seat to remove it, or an available seat to add it.'}
-          </p>
-        )}
-
-        <SeatMap
-          seats={seats}
-          reservationMarkers={reservationMarkers}
-          removableSeatIds={removableSeatIds}
-          pendingRemoveSeatIds={removeSeatIds}
-          selectedSeatIds={selectedSeatIds}
-          onSeatClick={editingId !== null ? handleSeatClick : undefined}
-        />
+        </div>
 
         <div className="reservation-section">
           {reservations.length === 0 ? (
