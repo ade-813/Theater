@@ -1,6 +1,8 @@
 import { useContext, useEffect, useMemo, useState } from 'react'
-import Navbar from '../components/Navbar'
 import SeatMap from '../components/SeatMap'
+import SeatLegend from '../components/SeatLegend'
+import ReservationItem from '../components/ReservationItem'
+import Proscenium from '../components/Proscenium'
 import { AuthContext } from '../context/AuthContext'
 import { getSeats } from '../api/seats'
 import { getReservations, updateReservation, deleteReservation } from '../api/reservations'
@@ -128,156 +130,95 @@ function Reservations() {
   }
 
   return (
-    <>
-      <Navbar />
-      <main className="page page-wide">
-        <h1>My reservations</h1>
-        {error && <p className="alert alert-error">{error}</p>}
-        {feedback && (
-          <p className={`alert ${feedback.type === 'error' ? 'alert-error' : 'alert-success'}`}>
-            {feedback.text}
-          </p>
-        )}
+    <main className="page page-wide">
+      <h1>{canManageOthers ? 'Manage reservations' : 'My reservations'}</h1>
 
-        <div className="layout">
-          <aside className="sidebar">
-            {canManageOthers && (
-              <div className="panel">
-                <h2 className="panel-title">Admin</h2>
-                <div className="field">
-                  <label htmlFor="user-picker">Managing reservations for</label>
-                  <select id="user-picker" value={viewedUserId} onChange={handleUserChange}>
-                    <option value={user.id}>{user.name} (you)</option>
-                    {users.filter((u) => u.id !== user.id).map((u) => (
-                      <option key={u.id} value={u.id}>{u.name}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            )}
+      {error && <p className="alert alert-error">{error}</p>}
+      {feedback && (
+        <p className={`alert ${feedback.type === 'error' ? 'alert-error' : 'alert-success'}`}>
+          {feedback.text}
+        </p>
+      )}
 
+      <div className="layout">
+        <aside className="sidebar">
+          {canManageOthers && (
             <div className="panel">
-              <h2 className="panel-title">Legend</h2>
-              <div className="seat-legend">
-                <span className="seat-legend-item">
-                  <span className="seat seat-available" aria-hidden="true" /> Available
-                </span>
-                <span className="seat-legend-item">
-                  <span className="seat seat-reserved" aria-hidden="true" /> Reserved
-                </span>
-                <span className="seat-legend-item">
-                  <span className="seat seat-available seat-premium" aria-hidden="true" /> Premium
-                </span>
-                {editingId !== null && (
-                  <>
-                    <span className="seat-legend-item">
-                      <span className="seat seat-own" aria-hidden="true" /> Editing
-                    </span>
-                    <span className="seat-legend-item">
-                      <span className="seat seat-selected" aria-hidden="true" /> To add
-                    </span>
-                    <span className="seat-legend-item">
-                      <span className="seat seat-removing" aria-hidden="true" /> To remove
-                    </span>
-                  </>
-                )}
+              <h2 className="panel-title">Admin — viewing</h2>
+              <div className="field">
+                <label htmlFor="user-picker">Reservations for</label>
+                <select id="user-picker" value={viewedUserId} onChange={handleUserChange}>
+                  <option value={user.id}>{user.name} (you)</option>
+                  {users.filter((u) => u.id !== user.id).map((u) => (
+                    <option key={u.id} value={u.id}>{u.name}</option>
+                  ))}
+                </select>
               </div>
             </div>
+          )}
 
-            {editingId !== null && (
-              <div className="panel">
-                <h2 className="panel-title">Editing reservation #{editingId}</h2>
-                <p className="text-muted">
-                  {selectedSeatIds.size > 0 || removeSeatIds.size > 0
-                    ? `${selectedSeatIds.size} seat(s) to add, ${removeSeatIds.size} to remove.`
-                    : 'Click a highlighted seat to remove it, or an available seat to add it.'}
-                </p>
-              </div>
-            )}
-          </aside>
-
-          <div className="main-panel">
-            <SeatMap
-              seats={seats}
-              reservationMarkers={reservationMarkers}
-              removableSeatIds={removableSeatIds}
-              pendingRemoveSeatIds={removeSeatIds}
-              selectedSeatIds={selectedSeatIds}
-              onSeatClick={editingId !== null ? handleSeatClick : undefined}
-            />
+          <div className="panel">
+            <h2 className="panel-title">Legend</h2>
+            <SeatLegend showEditing={editingId !== null} />
           </div>
-        </div>
 
-        <div className="reservation-section">
-          {reservations.length === 0 ? (
-            <p className="text-muted">No reservations yet.</p>
-          ) : (
+          {editingId !== null && (
+            <div className="panel">
+              <h2 className="panel-title">Editing #{editingId}</h2>
+              <p className="text-muted">
+                {selectedSeatIds.size > 0 || removeSeatIds.size > 0
+                  ? `+${selectedSeatIds.size} to add · −${removeSeatIds.size} to remove`
+                  : 'Click a seat to remove it or click an available seat to add.'}
+              </p>
+            </div>
+          )}
+        </aside>
+
+        <div className="main-panel">
+          <SeatMap
+            seats={seats}
+            reservationMarkers={reservationMarkers}
+            removableSeatIds={removableSeatIds}
+            pendingRemoveSeatIds={removeSeatIds}
+            selectedSeatIds={selectedSeatIds}
+            onSeatClick={editingId !== null ? handleSeatClick : undefined}
+          />
+          <Proscenium />
+        </div>
+      </div>
+
+      <div className="reservation-section">
+        {reservations.length === 0 ? (
+          <p className="text-muted">No reservations yet.</p>
+        ) : (
+          <>
+            <p className="reservation-section-title">
+              {reservations.length} reservation{reservations.length !== 1 ? 's' : ''}
+            </p>
             <ul className="reservation-list">
               {reservations.map((reservation, index) => (
-                <li className="reservation-item" key={reservation.id}>
-                  <div className="reservation-item-header">
-                    <span className={`reservation-marker seat-marker-${index % MARKER_COUNT}`} aria-hidden="true" />
-                    <span>
-                      Reservation #{reservation.id} - {reservation.seats.length} seat(s) -{' '}
-                      {new Date(reservation.createdAt).toLocaleString()}
-                    </span>
-                  </div>
-                  <p className="text-muted">
-                    {reservation.seats.map((seat) => `${seat.row}${seat.number}`).join(', ')}
-                  </p>
-
-                  {editingId === reservation.id ? (
-                    <div className="btn-row">
-                      <button type="button" className="btn btn-primary" onClick={handleSaveEdit} disabled={submitting}>
-                        Save changes
-                      </button>
-                      <button type="button" className="btn" onClick={cancelEdit} disabled={submitting}>
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="btn-row">
-                      <button
-                        type="button"
-                        className="btn"
-                        onClick={() => startEdit(reservation.id)}
-                        disabled={editingId !== null || confirmDeleteId !== null}
-                      >
-                        Edit
-                      </button>
-                      {confirmDeleteId === reservation.id ? (
-                        <>
-                          <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={() => handleDelete(reservation.id)}
-                            disabled={submitting}
-                          >
-                            Confirm delete
-                          </button>
-                          <button type="button" className="btn" onClick={() => setConfirmDeleteId(null)} disabled={submitting}>
-                            Cancel
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          type="button"
-                          className="btn"
-                          onClick={() => setConfirmDeleteId(reservation.id)}
-                          disabled={editingId !== null}
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </li>
+                <ReservationItem
+                  key={reservation.id}
+                  reservation={reservation}
+                  index={index}
+                  editingId={editingId}
+                  confirmDeleteId={confirmDeleteId}
+                  submitting={submitting}
+                  selectedSeatIds={selectedSeatIds}
+                  removeSeatIds={removeSeatIds}
+                  onEdit={startEdit}
+                  onCancelEdit={cancelEdit}
+                  onSaveEdit={handleSaveEdit}
+                  onDeleteRequest={setConfirmDeleteId}
+                  onDeleteConfirm={handleDelete}
+                  onDeleteCancel={() => setConfirmDeleteId(null)}
+                />
               ))}
             </ul>
-          )}
-        </div>
-      </main>
-    </>
+          </>
+        )}
+      </div>
+    </main>
   )
 }
 

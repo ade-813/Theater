@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt'
 import dayjs from 'dayjs'
 import { dbReady, dbGet, dbRun } from './db.mjs'
 
-// Fallback matches server/.env.example — required so 2FA still works on a
+// Fallback matches server/.env.example - required so 2FA still works on a
 // fresh clone where .env (gitignored) is absent, per REQUIREMENTS.md.
 export const TOTP_SECRET = process.env.TOTP_SECRET || 'LXBSMDTMSP2I5XFXIYRGFVWSFI'
 
@@ -20,19 +20,19 @@ const ROWS = [
 
 // At least 4 users, exactly 2 admin-capable (each with its own stored TOTP secret).
 const USERS = [
-  { username: 'alice', name: 'Alice Liddell', password: 'alicepw1', isAdmin: 0, totpSecret: null },
-  { username: 'bob', name: 'Bob Hatter', password: 'bobpw123', isAdmin: 1, totpSecret: TOTP_SECRET },
-  { username: 'carol', name: 'Carol Pleasance', password: 'carolpw1', isAdmin: 0, totpSecret: null },
-  { username: 'david', name: 'David Dodgson', password: 'davidpw1', isAdmin: 1, totpSecret: TOTP_SECRET }
+  { username: 'john', name: 'John Smith', password: 'johnpw1', isAdmin: 0, totpSecret: null },
+  { username: 'mark', name: 'Mark Johnson', password: 'markpw1', isAdmin: 1, totpSecret: TOTP_SECRET },
+  { username: 'sara', name: 'Sara Davis', password: 'sarapw1', isAdmin: 0, totpSecret: null },
+  { username: 'tom', name: 'Tom Wilson', password: 'tompw1', isAdmin: 1, totpSecret: TOTP_SECRET }
 ]
 
 // 4 reservations owned by exactly 2 users (1 admin-capable + 1 regular), 8 seats total
 // out of 106 -> 98 seats remain unreserved.
 const RESERVATIONS = [
-  { username: 'alice', seats: [['C', 1], ['C', 2]] },
-  { username: 'alice', seats: [['A', 5]] },
-  { username: 'bob', seats: [['D', 3], ['D', 4], ['D', 5]] },
-  { username: 'bob', seats: [['H', 10], ['H', 11]] }
+  { username: 'john', seats: [['C', 1], ['C', 2]] },
+  { username: 'john', seats: [['A', 5]] },
+  { username: 'mark', seats: [['D', 3], ['D', 4], ['D', 5]] },
+  { username: 'mark', seats: [['H', 10], ['H', 11]] }
 ]
 
 export async function seedIfEmpty() {

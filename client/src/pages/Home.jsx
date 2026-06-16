@@ -1,6 +1,9 @@
 import { useContext, useEffect, useMemo, useState } from 'react'
-import Navbar from '../components/Navbar'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheck, faXmark, faChair } from '@fortawesome/free-solid-svg-icons'
 import SeatMap from '../components/SeatMap'
+import SeatLegend from '../components/SeatLegend'
+import Proscenium from '../components/Proscenium'
 import { AuthContext } from '../context/AuthContext'
 import { getSeats } from '../api/seats'
 import { getReservations, createReservation } from '../api/reservations'
@@ -87,110 +90,100 @@ function Home() {
   }
 
   return (
-    <>
-      <Navbar />
-      <main className="page page-wide">
-        <h1>Theater seat map</h1>
-        {error && <p className="alert alert-error">{error}</p>}
-        {feedback && (
-          <p className={`alert ${feedback.type === 'error' ? 'alert-error' : 'alert-success'}`}>
-            {feedback.text}
-          </p>
-        )}
+    <main className="page page-wide">
+      <h1>Seat map</h1>
 
-        <div className="layout">
-          <aside className="sidebar">
-            <div className="panel">
-              <h2 className="panel-title">Legend</h2>
-              <div className="seat-legend">
-                <span className="seat-legend-item">
-                  <span className="seat seat-available" aria-hidden="true" /> Available
-                </span>
-                <span className="seat-legend-item">
-                  <span className="seat seat-reserved" aria-hidden="true" /> Reserved
-                </span>
-                {ownSeatIds.size > 0 && (
-                  <span className="seat-legend-item">
-                    <span className="seat seat-own" aria-hidden="true" /> Your seat
-                  </span>
-                )}
-                {user && (
-                  <span className="seat-legend-item">
-                    <span className="seat seat-selected" aria-hidden="true" /> Selected
-                  </span>
-                )}
-                <span className="seat-legend-item">
-                  <span className="seat seat-available seat-premium" aria-hidden="true" /> Premium
-                </span>
-              </div>
-            </div>
+      {error && <p className="alert alert-error">{error}</p>}
+      {feedback && (
+        <p className={`alert ${feedback.type === 'error' ? 'alert-error' : 'alert-success'}`}>
+          {feedback.text}
+        </p>
+      )}
 
-            {user ? (
-              <>
-                <form className="panel" onSubmit={handleSelectionSubmit}>
-                  <h2 className="panel-title">Reserve selected seats</h2>
-                  <p className="text-muted">
-                    {selectedSeatIds.size === 0
-                      ? 'Click available seats on the map to select them.'
-                      : `${selectedSeatIds.size} seat(s) selected.`}
-                  </p>
-                  <div className="btn-row">
-                    <button type="submit" className="btn btn-primary" disabled={selectedSeatIds.size === 0 || submitting}>
-                      Reserve
-                    </button>
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={() => setSelectedSeatIds(new Set())}
-                      disabled={selectedSeatIds.size === 0}
-                    >
-                      Clear
-                    </button>
-                  </div>
-                </form>
+      <div className="layout">
+        <aside className="sidebar">
+          <div className="panel">
+            <h2 className="panel-title">Legend</h2>
+            <SeatLegend showOwn={ownSeatIds.size > 0} showSelected={!!user} />
+          </div>
 
-                <form className="panel" onSubmit={handleCategorySubmit}>
-                  <h2 className="panel-title">Assign by category</h2>
-                  <div className="field">
-                    <label htmlFor="seat-count">Number of seats</label>
-                    <input
-                      id="seat-count"
-                      type="number"
-                      min="1"
-                      value={count}
-                      onChange={(event) => setCount(event.target.value)}
-                    />
-                  </div>
-                  <div className="field">
-                    <label htmlFor="seat-category">Category</label>
-                    <select id="seat-category" value={category} onChange={(event) => setCategory(event.target.value)}>
-                      <option value="normal">Normal</option>
-                      <option value="premium">Premium</option>
-                    </select>
-                  </div>
-                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+          {user ? (
+            <>
+              <form className="panel" onSubmit={handleSelectionSubmit}>
+                <h2 className="panel-title">Reserve selected</h2>
+                <p className="text-muted">
+                  {selectedSeatIds.size === 0
+                    ? 'Click seats on the map to select them.'
+                    : `${selectedSeatIds.size} seat(s) selected.`}
+                </p>
+                <div className="btn-row">
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-sm"
+                    disabled={selectedSeatIds.size === 0 || submitting}
+                  >
+                    <FontAwesomeIcon icon={faChair} />
                     Reserve
                   </button>
-                </form>
-              </>
-            ) : (
-              <div className="panel">
-                <p className="text-muted">Log in to make a reservation.</p>
-              </div>
-            )}
-          </aside>
+                  <button
+                    type="button"
+                    className="btn btn-sm"
+                    onClick={() => setSelectedSeatIds(new Set())}
+                    disabled={selectedSeatIds.size === 0}
+                  >
+                    <FontAwesomeIcon icon={faXmark} />
+                    Clear
+                  </button>
+                </div>
+              </form>
 
-          <div className="main-panel">
-            <SeatMap
-              seats={seats}
-              ownSeatIds={ownSeatIds}
-              selectedSeatIds={selectedSeatIds}
-              onSeatClick={user ? toggleSeat : undefined}
-            />
-          </div>
+              <form className="panel" onSubmit={handleCategorySubmit}>
+                <h2 className="panel-title">Assign by category</h2>
+                <div className="field">
+                  <label htmlFor="seat-count">Number of seats</label>
+                  <input
+                    id="seat-count"
+                    type="number"
+                    min="1"
+                    value={count}
+                    onChange={(e) => setCount(e.target.value)}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="seat-category">Category</label>
+                  <select
+                    id="seat-category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                  >
+                    <option value="normal">Normal</option>
+                    <option value="premium">Premium</option>
+                  </select>
+                </div>
+                <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>
+                  <FontAwesomeIcon icon={faCheck} />
+                  Reserve
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className="panel">
+              <p className="text-muted">Log in to reserve a seat.</p>
+            </div>
+          )}
+        </aside>
+
+        <div className="main-panel">
+          <SeatMap
+            seats={seats}
+            ownSeatIds={ownSeatIds}
+            selectedSeatIds={selectedSeatIds}
+            onSeatClick={user ? toggleSeat : undefined}
+          />
+          <Proscenium />
         </div>
-      </main>
-    </>
+      </div>
+    </main>
   )
 }
 

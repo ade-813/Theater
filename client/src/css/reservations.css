@@ -1,0 +1,123 @@
+.reservation-section {
+  margin-top: var(--space-7);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+.reservation-section-title {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-5);
+}
+
+.reservation-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Each reservation = a ticket card */
+.reservation-item {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  border-left: 4px solid transparent;
+  padding: var(--space-5) var(--space-5) var(--space-4);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition:
+    background var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease,
+    transform var(--dur-fast) ease;
+}
+
+.reservation-item:hover {
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* Ticket perforation notches */
+.reservation-item::before,
+.reservation-item::after {
+  content: '';
+  position: absolute;
+  left: -7px;
+  width: 12px;
+  height: 12px;
+  background: var(--color-bg);
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+}
+
+.reservation-item::before { top: -6px; }
+.reservation-item::after  { bottom: -6px; }
+
+/* ── Header row ────────────────────────────────────────────── */
+.reservation-item-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.reservation-item-number {
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+  font-weight: 300;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.reservation-item-meta {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-left: auto;
+}
+
+.reservation-marker {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+/* ── Seat chips ────────────────────────────────────────────── */
+.seat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--space-2);
+}
+
+.seat-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 2px;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  letter-spacing: 0.06em;
+  box-shadow: var(--shadow-sm);
+}
+
+.edit-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-accent);
+  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
+  margin: var(--space-2) 0 0;
+}

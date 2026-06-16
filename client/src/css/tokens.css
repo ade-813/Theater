@@ -1,0 +1,130 @@
+
+:root {
+  color-scheme: light;
+
+  --color-bg:               #e8e0d0;
+  --color-surface:          #f2ead8;
+  --color-surface-alt:      #ddd5c4;
+  --color-surface-elevated: #faf4e6;
+  --color-surface-deep:     #d4cabb;
+
+  --color-border:           rgba(0, 0, 0, 0.07);
+  --color-border-strong:    rgba(0, 0, 0, 0.14);
+  --color-border-accent:    rgba(138, 107, 61, 0.35);
+
+  --color-text-primary:     #18140f;
+  --color-text-secondary:   #5c5448;
+  --color-text-tertiary:    #a09080;
+  --color-text-inverse:     #f2ead8;
+
+  --color-accent:           #8a6b3d;
+  --color-accent-hover:     #6e5230;
+  --color-accent-soft:      rgba(138, 107, 61, 0.10);
+  --color-accent-glow:      rgba(138, 107, 61, 0.22);
+
+  --color-danger:           #8a3535;
+  --color-danger-soft:      rgba(138, 53, 53, 0.08);
+
+  /* Seats */
+  --color-seat-available:        #cec8ba;
+  --color-seat-available-border: #a8a090;
+  --color-seat-reserved:         #b8b3a8;
+  --color-seat-reserved-border:  #8c877e;
+  --color-seat-own:              rgba(138, 107, 61, 0.16);
+  --color-seat-own-border:       #8a6b3d;
+  --color-seat-premium-accent:   #8a6b3d;
+
+  /* Reservation markers */
+  --color-marker-0: #8a6b3d; --color-marker-0-bg: rgba(138,107,61,0.14);
+  --color-marker-1: #3d6b5a; --color-marker-1-bg: rgba(61,107,90,0.14);
+  --color-marker-2: #6b3d8a; --color-marker-2-bg: rgba(107,61,138,0.14);
+  --color-marker-3: #8a3d3d; --color-marker-3-bg: rgba(138,61,61,0.14);
+  --color-marker-4: #3d5f8a; --color-marker-4-bg: rgba(61,95,138,0.14);
+
+  /* Shadows — warm and soft */
+  --shadow-sm:    0 1px 4px rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:    0 4px 20px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+  --shadow-lg:    0 12px 48px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-inset: inset 0 2px 6px rgba(0,0,0,0.07);
+
+  /* Space scale */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;
+  --space-4: 16px;  --space-5: 24px;  --space-6: 36px;
+  --space-7: 52px;  --space-8: 72px;
+
+  /* Radii */
+  --radius:    4px;
+  --radius-lg: 8px;
+  --radius-xl: 14px;
+
+  /* Typography */
+  --font-display: 'Cormorant Garamond', Georgia, 'Palatino Linotype', serif;
+  --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:    'Courier New', Courier, monospace;
+
+  --font-size-xs:   0.75rem;
+  --font-size-sm:   0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg:   1.125rem;
+  --font-size-xl:   1.5rem;
+  --font-size-2xl:  2.25rem;
+  --font-size-3xl:  3rem;
+
+  /* Motion */
+  --ease-theater: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-expo: cubic-bezier(0.7, 0, 0.84, 0);
+  --dur-fast:     130ms;
+  --dur-base:     220ms;
+  --dur-slow:     480ms;
+  --dur-curtain:  640ms;
+}
+
+/* ── Dark mode: stage blackout ─────────────────────────────── */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg:               #090807;
+  --color-surface:          #0f0d0b;
+  --color-surface-alt:      #141210;
+  --color-surface-elevated: #1c1916;
+  --color-surface-deep:     #060504;
+
+  --color-border:           rgba(255, 255, 255, 0.055);
+  --color-border-strong:    rgba(255, 255, 255, 0.11);
+  --color-border-accent:    rgba(200, 169, 110, 0.28);
+
+  --color-text-primary:     #e8dcc8;
+  --color-text-secondary:   #9a9080;
+  --color-text-tertiary:    #584f44;
+  --color-text-inverse:     #0f0d0b;
+
+  --color-accent:           #c8a96e;
+  --color-accent-hover:     #e2c080;
+  --color-accent-soft:      rgba(200, 169, 110, 0.10);
+  --color-accent-glow:      rgba(200, 169, 110, 0.18);
+
+  --color-danger:           #b04848;
+  --color-danger-soft:      rgba(176, 72, 72, 0.12);
+
+  /* Seats */
+  --color-seat-available:        #1a1814;
+  --color-seat-available-border: #342f26;
+  --color-seat-reserved:         #110f0c;
+  --color-seat-reserved-border:  #221e18;
+  --color-seat-own:              rgba(200, 169, 110, 0.12);
+  --color-seat-own-border:       #c8a96e;
+  --color-seat-premium-accent:   #c8a96e;
+
+  /* Reservation markers */
+  --color-marker-0: #c8a96e; --color-marker-0-bg: rgba(200,169,110,0.11);
+  --color-marker-1: #6aab96; --color-marker-1-bg: rgba(106,171,150,0.11);
+  --color-marker-2: #a07cc8; --color-marker-2-bg: rgba(160,124,200,0.11);
+  --color-marker-3: #c87878; --color-marker-3-bg: rgba(200,120,120,0.11);
+  --color-marker-4: #78a0c8; --color-marker-4-bg: rgba(120,160,200,0.11);
+
+  /* Shadows — deep and atmospheric */
+  --shadow-sm:    0 2px 8px rgba(0,0,0,0.45);
+  --shadow-md:    0 6px 28px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.35);
+  --shadow-lg:    0 16px 60px rgba(0,0,0,0.65), 0 6px 20px rgba(0,0,0,0.40);
+  --shadow-inset: inset 0 2px 8px rgba(0,0,0,0.5);
+}

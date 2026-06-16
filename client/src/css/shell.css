@@ -1,0 +1,10 @@
+.app-shell {
+  flex: 1;
+  display: flex;
+}
+
+.app-content {
+  flex: 1;
+  min-width: 0;
+  animation: lights-up var(--dur-curtain) var(--ease-theater) both;
+}

@@ -1,0 +1,21 @@
+.alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-5);
+  animation: drop-in var(--dur-base) var(--ease-theater) both;
+}
+
+.alert-error {
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger);
+  color: var(--color-danger);
+  box-shadow: 0 2px 12px var(--color-danger-soft);
+}
+
+.alert-success {
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: 0 2px 12px var(--color-accent-soft);
+}

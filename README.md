@@ -31,9 +31,9 @@ in, so the app runs out of the box on a fresh clone with no `.env` file.
 
 ### Two-factor authentication (TOTP)
 
-Admin-capable users (`bob`, `david`) can choose, at login, to "act as admin",
-which requires a 6-digit TOTP code generated from the secret`(check .env.example and rename it it .env) (the shared secret from `REQUIREMENTS.md`, stored
-per-user in the `users` table).
+Admin-capable users (`mark`, `tom`) can choose, at login, to "act as admin",
+which requires a 6-digit TOTP code generated from the shared TOTP secret
+(stored per-user in the `users` table; see `server/.env.example` for the value).
 
 For convenience during development, the server prints the currently valid
 code to its console every 30 seconds:
@@ -47,12 +47,12 @@ skipped when `NODE_ENV=production`).
 
 ### Seeded users
 
-| Username | Password   | Admin-capable (TOTP) |
-| -------- | ---------- | --------------------- |
-| alice    | alicepw1   | no                     |
-| bob      | bobpw123   | yes                    |
-| carol    | carolpw1   | no                     |
-| david    | davidpw1   | yes                    |
+| Username | Password | Admin-capable (TOTP) |
+| -------- | -------- | --------------------- |
+| john     | johnpw1  | no                    |
+| mark     | markpw1  | yes                   |
+| sara     | sarapw1  | no                    |
+| tom      | tompw1   | yes                   |
 
 ---
 

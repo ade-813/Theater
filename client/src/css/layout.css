@@ -1,0 +1,97 @@
+
+.page {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-6);
+}
+
+.page > h1 {
+  font-size: var(--font-size-3xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-6);
+  letter-spacing: -0.02em;
+}
+
+.page-wide { max-width: 1100px; }
+
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+}
+
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.main-panel {
+  flex: 1;
+  min-width: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-md);
+  /* subtle spotlight from the stage below */
+  background-image: radial-gradient(ellipse 80% 40% at 50% 110%, var(--color-accent-soft), transparent);
+  transition:
+    background-color var(--dur-base) ease,
+    box-shadow var(--dur-base) ease;
+}
+
+/* ── Panels ────────────────────────────────────────────────── */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition:
+    background var(--dur-base) ease,
+    box-shadow var(--dur-base) ease;
+}
+
+.panel-title {
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin: 0 0 var(--space-3);
+}
+
+/* ── Misc utilities ────────────────────────────────────────── */
+.text-muted {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  line-height: 1.65;
+  margin: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.badge-accent {
+  border-color: var(--color-border-accent);
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+@media (max-width: 720px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; }
+}
