@@ -22,9 +22,26 @@ CREATE TABLE IF NOT EXISTS seats (
   UNIQUE (row_label, seat_number)
 );
 
+CREATE TABLE IF NOT EXISTS shows (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  description TEXT,
+  poster_url TEXT,
+  duration INTEGER NOT NULL DEFAULT 120
+);
+
+CREATE TABLE IF NOT EXISTS show_dates (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  show_id INTEGER NOT NULL REFERENCES shows(id),
+  date TEXT NOT NULL,
+  time TEXT NOT NULL,
+  end_time TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS reservations (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL REFERENCES users(id),
+  show_date_id INTEGER NOT NULL REFERENCES show_dates(id),
   created_at TEXT NOT NULL
 );
 
@@ -37,8 +54,9 @@ CREATE TABLE IF NOT EXISTS reservation_seats (
 CREATE TABLE IF NOT EXISTS seat_cooldowns (
   seat_id INTEGER NOT NULL REFERENCES seats(id),
   user_id INTEGER NOT NULL REFERENCES users(id),
+  show_date_id INTEGER NOT NULL REFERENCES show_dates(id),
   released_at TEXT NOT NULL,
-  PRIMARY KEY (seat_id, user_id)
+  PRIMARY KEY (seat_id, user_id, show_date_id)
 );
 `
 

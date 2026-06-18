@@ -2,8 +2,6 @@ import bcrypt from 'bcrypt'
 import dayjs from 'dayjs'
 import { dbReady, dbGet, dbRun } from './db.mjs'
 
-// Fallback matches server/.env.example - required so 2FA still works on a
-// fresh clone where .env (gitignored) is absent, per REQUIREMENTS.md.
 export const TOTP_SECRET = process.env.TOTP_SECRET || 'LXBSMDTMSP2I5XFXIYRGFVWSFI'
 
 // Theater layout: 8 rows, 5 distinct row lengths, rows A & B are premium.
@@ -18,7 +16,6 @@ const ROWS = [
   { label: 'H', length: 18, category: 'normal' }
 ]
 
-// At least 4 users, exactly 2 admin-capable (each with its own stored TOTP secret).
 const USERS = [
   { username: 'john', name: 'John Smith', password: 'johnpw1', isAdmin: 0, totpSecret: null },
   { username: 'mark', name: 'Mark Johnson', password: 'markpw1', isAdmin: 1, totpSecret: TOTP_SECRET },
@@ -26,13 +23,50 @@ const USERS = [
   { username: 'tom', name: 'Tom Wilson', password: 'tompw1', isAdmin: 1, totpSecret: TOTP_SECRET }
 ]
 
-// 4 reservations owned by exactly 2 users (1 admin-capable + 1 regular), 8 seats total
-// out of 106 -> 98 seats remain unreserved.
+const SHOWS = [
+  {
+    title: 'Hamlet',
+    description: 'Shakespeare\'s timeless tragedy of the Prince of Denmark.',
+    posterUrl: 'https://assets.mycast.io/posters/hamlet-2025-fan-casting-poster-130308-large.jpg',
+    duration: 150,
+    dates: [
+      { date: '2026-07-10', time: '19:00' },
+      { date: '2026-07-11', time: '19:00' },
+      { date: '2026-07-12', time: '15:00' }
+    ]
+  },
+  {
+    title: 'The Phantom of the Opera',
+    description: 'A legendary musical of love and obsession beneath the Paris Opera House.',
+    posterUrl: 'https://www.limelighttheatre.com.au/wp-content/uploads/2020/05/Phantom-of-the-Opera-Poster.jpg',
+    duration: 150,
+    dates: [
+      { date: '2026-07-12', time: '19:00' },
+      { date: '2026-07-18', time: '19:00' },
+      { date: '2026-07-19', time: '19:00' }
+    ]
+  },
+  {
+    title: 'A Midsummer Night\'s Dream',
+    description: 'Shakespeare\'s enchanting comedy of love, magic, and mischief.',
+    posterUrl: 'https://m.media-amazon.com/images/I/71plvG7VRiL._SL1400_.jpg',
+    duration: 120,
+    dates: [
+      { date: '2026-08-01', time: '19:00' },
+      { date: '2026-08-02', time: '15:00' },
+      { date: '2026-08-02', time: '19:00' }
+    ]
+  }
+]
+
+const computeEndTime = (date, time, duration) =>
+  dayjs(`${date}T${time}`).add(duration, 'minute').format('HH:mm')
+
 const RESERVATIONS = [
-  { username: 'john', seats: [['C', 1], ['C', 2]] },
-  { username: 'john', seats: [['A', 5]] },
-  { username: 'mark', seats: [['D', 3], ['D', 4], ['D', 5]] },
-  { username: 'mark', seats: [['H', 10], ['H', 11]] }
+  { username: 'john', showIndex: 0, dateIndex: 0, seats: [['C', 1], ['C', 2]] },
+  { username: 'john', showIndex: 0, dateIndex: 1, seats: [['A', 5]] },
+  { username: 'mark', showIndex: 1, dateIndex: 0, seats: [['D', 3], ['D', 4], ['D', 5]] },
+  { username: 'mark', showIndex: 1, dateIndex: 1, seats: [['H', 10], ['H', 11]] }
 ]
 
 export async function seedIfEmpty() {
@@ -61,10 +95,29 @@ export async function seedIfEmpty() {
     userIds[user.username] = lastID
   }
 
+  const showDateIds = []
+  for (const show of SHOWS) {
+    const { lastID: showId } = await dbRun(
+      'INSERT INTO shows (title, description, poster_url, duration) VALUES (?, ?, ?, ?)',
+      [show.title, show.description, show.posterUrl, show.duration]
+    )
+    const dateIds = []
+    for (const d of show.dates) {
+      const endTime = computeEndTime(d.date, d.time, show.duration)
+      const { lastID: dateId } = await dbRun(
+        'INSERT INTO show_dates (show_id, date, time, end_time) VALUES (?, ?, ?, ?)',
+        [showId, d.date, d.time, endTime]
+      )
+      dateIds.push(dateId)
+    }
+    showDateIds.push(dateIds)
+  }
+
   for (const reservation of RESERVATIONS) {
+    const showDateId = showDateIds[reservation.showIndex][reservation.dateIndex]
     const { lastID: reservationId } = await dbRun(
-      'INSERT INTO reservations (user_id, created_at) VALUES (?, ?)',
-      [userIds[reservation.username], dayjs().toISOString()]
+      'INSERT INTO reservations (user_id, show_date_id, created_at) VALUES (?, ?, ?)',
+      [userIds[reservation.username], showDateId, dayjs().toISOString()]
     )
     for (const [rowLabel, seatNumber] of reservation.seats) {
       const seat = await dbGet('SELECT id FROM seats WHERE row_label = ? AND seat_number = ?', [
@@ -78,5 +131,5 @@ export async function seedIfEmpty() {
     }
   }
 
-  console.log('Database seeded with theater layout, users and reservations.')
+  console.log('Database seeded with theater layout, shows, users and reservations.')
 }

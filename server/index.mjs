@@ -11,6 +11,8 @@ import sessionsRouter from './routes/sessions.mjs'
 import seatsRouter from './routes/seats.mjs'
 import reservationsRouter from './routes/reservations.mjs'
 import usersRouter from './routes/users.mjs'
+import showsRouter from './routes/shows.mjs'
+import adminRouter from './routes/admin.mjs'
 
 const app = express()
 const port = 3001
@@ -42,6 +44,8 @@ app.use('/api/sessions', sessionsRouter)
 app.use('/api/seats', seatsRouter)
 app.use('/api/reservations', reservationsRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/shows', showsRouter)
+app.use('/api/admin', adminRouter)
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' })
