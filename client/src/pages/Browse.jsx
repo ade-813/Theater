@@ -11,24 +11,28 @@ function Browse() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    getShows()
-      .then(setShows)
-      .finally(() => setLoading(false))
+    getShows().then(setShows).finally(() => setLoading(false))
   }, [])
 
   const featured = shows[0]
 
   return (
-    <div className="page-browse">
+    <div className="min-vh-100">
+
+      {}
       {!loading && featured && (
         <section
           className="browse-hero"
-          style={{ '--hero-poster': featured.posterUrl ? `url(${JSON.stringify(featured.posterUrl)})` : 'none' }}
+          style={{
+            '--hero-poster': featured.posterUrl
+              ? `url(${JSON.stringify(featured.posterUrl)})`
+              : 'none',
+          }}
         >
           <div className="browse-hero-bg" />
           <div className="browse-hero-content">
             <p className="browse-hero-eyebrow">Featured show</p>
-            <h1 className="browse-hero-title">{featured.title}</h1>
+            <h2 className="browse-hero-title">{featured.title}</h2>
             {featured.description && (
               <p className="browse-hero-desc">{featured.description}</p>
             )}
@@ -39,10 +43,12 @@ function Browse() {
               </span>
               <span>
                 <FontAwesomeIcon icon={faCalendarDays} />
-                {featured.dates?.length ?? 0} upcoming date{featured.dates?.length !== 1 ? 's' : ''}
+                {featured.dates?.length ?? 0} date
+                {featured.dates?.length !== 1 ? 's' : ''}
               </span>
             </div>
             <button
+              type="button"
               className="btn btn-primary browse-hero-btn"
               onClick={() => navigate(`/shows/${featured.id}`)}
             >
@@ -53,20 +59,27 @@ function Browse() {
         </section>
       )}
 
-      <section className="browse-section">
-        <h2 className="browse-section-title">All shows</h2>
+      {}
+      <section className="px-4 pt-4 pb-5">
+        <div className="d-flex align-items-center gap-3 mb-4">
+          <span className="browse-section-line" />
+          <h2 className="browse-section-title mb-0 text-nowrap">All Shows</h2>
+          <span className="browse-section-line" />
+        </div>
+
         {loading ? (
           <p className="text-muted">Loading…</p>
         ) : shows.length === 0 ? (
           <p className="text-muted">No shows available.</p>
         ) : (
           <div className="show-grid">
-            {shows.map((show) => (
-              <ShowCard key={show.id} show={show} />
+            {shows.map((show, i) => (
+              <ShowCard key={show.id} show={show} index={i} />
             ))}
           </div>
         )}
       </section>
+
     </div>
   )
 }

@@ -56,8 +56,7 @@ function Login() {
   return (
     <div className="page-login">
       <div className="login-box">
-        <div className="card border-0 shadow-lg p-4 p-md-5">
-          <div className="card-body p-0">
+        <div className="login-card">
             <div className="login-emblem">
               <FontAwesomeIcon icon={faMasksTheater} />
             </div>
@@ -151,7 +150,6 @@ function Login() {
                 </div>
               </form>
             )}
-          </div>
         </div>
       </div>
     </div>

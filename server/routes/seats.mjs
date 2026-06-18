@@ -3,8 +3,8 @@ import { dbGet, dbAll } from '../db.mjs'
 
 const router = express.Router()
 
-// GET /api/seats?showDateId=N — availability scoped to a show date
-// GET /api/seats — plain seat list without reservation status
+// GET /api/seats?showDateId=N - availability scoped to a show date
+// GET /api/seats - plain seat list without reservation status
 router.get('/', async (req, res, next) => {
   try {
     const { showDateId } = req.query

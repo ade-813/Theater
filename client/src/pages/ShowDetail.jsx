@@ -21,7 +21,7 @@ function ShowDetail() {
   }, [showId])
 
   if (error) return (
-    <div className="page-show-detail">
+    <div className="min-vh-100">
       <div className="show-detail-hero" style={{ '--poster': 'none' }}>
         <div className="show-detail-hero-overlay" />
         <div className="show-detail-hero-content">
@@ -35,7 +35,7 @@ function ShowDetail() {
   )
 
   if (!show) return (
-    <div className="page-show-detail">
+    <div className="min-vh-100">
       <div className="show-detail-hero" style={{ '--poster': 'none' }}>
         <div className="show-detail-hero-overlay" />
         <div className="show-detail-hero-content">
@@ -46,7 +46,7 @@ function ShowDetail() {
   )
 
   return (
-    <div className="page-show-detail">
+    <div className="min-vh-100">
       <div
         className="show-detail-hero"
         style={{ '--poster': show.posterUrl ? `url(${JSON.stringify(show.posterUrl)})` : 'none' }}
@@ -74,19 +74,20 @@ function ShowDetail() {
         </div>
       </div>
 
-      <div className="show-detail-dates">
-        <h2 className="show-detail-dates-heading">
+      <div className="p-4 p-lg-5">
+        <h2 className="show-detail-dates-heading d-flex align-items-center gap-2">
           <FontAwesomeIcon icon={faCalendarDays} />
           Choose a date
         </h2>
         {show.dates.length === 0 ? (
           <p className="text-muted">No upcoming dates scheduled.</p>
         ) : (
-          <div className="date-grid">
-            {show.dates.map((d) => (
+          <div className="d-flex flex-wrap gap-3">
+            {show.dates.map((d, i) => (
               <button
                 key={d.id}
                 className="date-chip"
+                style={{ '--chip-index': i }}
                 onClick={() => navigate(`/shows/${show.id}/dates/${d.id}`)}
               >
                 <span className="date-chip-month">{fmtMonth(d.date)}</span>

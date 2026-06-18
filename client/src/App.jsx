@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom'
+import LandingPage from './pages/LandingPage'
 import Browse from './pages/Browse'
 import ShowDetail from './pages/ShowDetail'
 import SeatSelection from './pages/SeatSelection'
@@ -17,7 +18,8 @@ function App() {
         <Sidebar />
         <div className="app-content">
           <Routes>
-            <Route path="/" element={<Browse />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/shows" element={<Browse />} />
             <Route path="/shows/:showId" element={<ShowDetail />} />
             <Route path="/shows/:showId/dates/:dateId" element={<SeatSelection />} />
             <Route path="/login" element={<Login />} />

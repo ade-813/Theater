@@ -7,7 +7,9 @@ const router = express.Router()
 router.get('/', async (req, res, next) => {
   try {
     const shows = await dbAll(
-      'SELECT id, title, description, poster_url AS posterUrl, duration FROM shows ORDER BY title'
+      'With start_dates as (SELECT show_id as id, MIN(date) as date FROM show_dates GROUP BY show_id) '+
+      'SELECT id, title, description, poster_url AS posterUrl, duration FROM shows ' +
+      'LEFT JOIN start_dates USING (id) ORDER BY date ASC '
     )
     for (const show of shows)
       show.dates = await dbAll(

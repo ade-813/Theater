@@ -65,7 +65,7 @@ const validateSeatIds = async (seatIds, userId, showDateId) => {
   }
 }
 
-// GET /api/reservations — current user's reservations (admin can pass ?userId=)
+// GET /api/reservations - current user's reservations (admin can pass ?userId=)
 router.get('/', isLoggedIn, async (req, res, next) => {
   try {
     let userId = req.user.id
@@ -92,7 +92,7 @@ router.get('/', isLoggedIn, async (req, res, next) => {
   }
 })
 
-// POST /api/reservations — body: { showDateId, seatIds } or { showDateId, count, category }
+// POST /api/reservations - body: { showDateId, seatIds } or { showDateId, count, category }
 router.post('/', isLoggedIn, async (req, res, next) => {
   let chosenSeatIds
   try {
@@ -156,7 +156,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
   }
 })
 
-// PUT /api/reservations/:id — add/remove seats
+// PUT /api/reservations/:id - add/remove seats
 router.put('/:id', isLoggedIn, async (req, res, next) => {
   try {
     const reservation = await dbGet('SELECT * FROM reservations WHERE id = ?', [req.params.id])

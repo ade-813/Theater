@@ -88,6 +88,8 @@ function Reservations() {
     setRemoveSeatIds(new Set())
     setConfirmDeleteId(null)
     setToast(null)
+    const r = reservations.find((r) => r.id === id)
+    if (r) getSeats(r.showDateId).then(setSeats).catch(() => {})
   }
 
   const cancelEdit = () => {
@@ -162,8 +164,8 @@ function Reservations() {
       )}
 
       {editingId !== null && (
-        <div className="page-layout mb-2">
-          <aside className="page-layout-sidebar">
+        <div className="row g-3 align-items-start mb-2">
+          <aside className="col-12 col-md-4 col-lg-3 d-flex flex-column gap-3">
             <div className="card">
               <div className="card-body">
                 <p className="panel-label">Legend</p>
@@ -182,7 +184,7 @@ function Reservations() {
             </div>
           </aside>
 
-          <div className="page-layout-main">
+          <div className="col-12 col-md-8 col-lg-9">
             <div className="card">
               <div className="card-body">
                 <SeatMap

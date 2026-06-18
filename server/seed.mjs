@@ -17,10 +17,13 @@ const ROWS = [
 ]
 
 const USERS = [
-  { username: 'john', name: 'John Smith', password: 'johnpw1', isAdmin: 0, totpSecret: null },
-  { username: 'mark', name: 'Mark Johnson', password: 'markpw1', isAdmin: 1, totpSecret: TOTP_SECRET },
-  { username: 'sara', name: 'Sara Davis', password: 'sarapw1', isAdmin: 0, totpSecret: null },
-  { username: 'tom', name: 'Tom Wilson', password: 'tompw1', isAdmin: 1, totpSecret: TOTP_SECRET }
+  { username: 'john',  name: 'John Smith',    password: 'johnpw1',  isAdmin: 0, totpSecret: null },
+  { username: 'mark',  name: 'Mark Johnson',  password: 'markpw1',  isAdmin: 1, totpSecret: TOTP_SECRET },
+  { username: 'sara',  name: 'Sara Davis',    password: 'sarapw1',  isAdmin: 0, totpSecret: null },
+  { username: 'tom',   name: 'Tom Wilson',    password: 'tompw1',   isAdmin: 1, totpSecret: TOTP_SECRET },
+  { username: 'mira', name: 'Mira Rossi',   password: 'mirapw1', isAdmin: 0, totpSecret: null },
+  { username: 'bob',   name: 'Bob Ferrari',   password: 'bobpw1',   isAdmin: 0, totpSecret: null },
+  { username: 'emma',  name: 'Emma Bianchi',  password: 'emmapw1',  isAdmin: 0, totpSecret: null }
 ]
 
 const SHOWS = [
@@ -56,6 +59,31 @@ const SHOWS = [
       { date: '2026-08-02', time: '15:00' },
       { date: '2026-08-02', time: '19:00' }
     ]
+  },
+  {
+    title: 'Romeo and Juliet',
+    description: 'The world\'s greatest love story - passion, rivalry, and tragedy in Verona.',
+    posterUrl: 'https://i.pinimg.com/736x/7d/a4/d0/7da4d06680ac41dbdcc0c02977b68de1.jpg',
+    duration: 135,
+    dates: [
+      { date: '2026-08-14', time: '19:30' },
+      { date: '2026-08-15', time: '19:30' },
+      { date: '2026-08-16', time: '15:00' },
+      { date: '2026-08-22', time: '19:30' }
+    ]
+  },
+  {
+    title: 'The Nutcracker',
+    description: 'Tchaikovsky\'s beloved Christmas ballet - a magical journey through the Land of Sweets.',
+    posterUrl: 'https://media.fathomentertainment.com/image/826249444369/image_lgkl8ik22d7s1dtgqnkobc4i3q/-S400-Fwebp',
+    duration: 95,
+    dates: [
+      { date: '2026-12-19', time: '18:00' },
+      { date: '2026-12-20', time: '15:00' },
+      { date: '2026-12-20', time: '19:00' },
+      { date: '2026-12-21', time: '15:00' },
+      { date: '2026-12-21', time: '19:00' }
+    ]
   }
 ]
 
@@ -63,10 +91,37 @@ const computeEndTime = (date, time, duration) =>
   dayjs(`${date}T${time}`).add(duration, 'minute').format('HH:mm')
 
 const RESERVATIONS = [
-  { username: 'john', showIndex: 0, dateIndex: 0, seats: [['C', 1], ['C', 2]] },
-  { username: 'john', showIndex: 0, dateIndex: 1, seats: [['A', 5]] },
-  { username: 'mark', showIndex: 1, dateIndex: 0, seats: [['D', 3], ['D', 4], ['D', 5]] },
-  { username: 'mark', showIndex: 1, dateIndex: 1, seats: [['H', 10], ['H', 11]] }
+  // john - Hamlet
+  { username: 'john',  showIndex: 0, dateIndex: 0, seats: [['C', 1], ['C', 2]] },
+  { username: 'john',  showIndex: 0, dateIndex: 1, seats: [['A', 5]] },
+  // mark - Phantom
+  { username: 'mark',  showIndex: 1, dateIndex: 0, seats: [['D', 3], ['D', 4], ['D', 5]] },
+  { username: 'mark',  showIndex: 1, dateIndex: 1, seats: [['H', 10], ['H', 11]] },
+  // john - Midsummer
+  { username: 'john',  showIndex: 2, dateIndex: 0, seats: [['B', 2], ['B', 3], ['B', 4]] },
+  { username: 'john',  showIndex: 2, dateIndex: 2, seats: [['E', 7], ['E', 8]] },
+  // mark - Romeo and Juliet
+  { username: 'mark',  showIndex: 3, dateIndex: 0, seats: [['A', 1], ['A', 2], ['A', 3]] },
+  { username: 'mark',  showIndex: 3, dateIndex: 2, seats: [['F', 5], ['F', 6], ['F', 7], ['F', 8]] },
+  // john - Nutcracker
+  { username: 'john',  showIndex: 4, dateIndex: 0, seats: [['G', 3], ['G', 4]] },
+  { username: 'john',  showIndex: 4, dateIndex: 2, seats: [['C', 8], ['C', 9], ['C', 10]] },
+  // mark - Nutcracker
+  { username: 'mark',  showIndex: 4, dateIndex: 1, seats: [['B', 6], ['B', 7], ['B', 8]] },
+  // sara - Hamlet + Midsummer
+  { username: 'sara',  showIndex: 0, dateIndex: 2, seats: [['D', 7], ['D', 8]] },
+  { username: 'sara',  showIndex: 2, dateIndex: 1, seats: [['H', 1], ['H', 2], ['H', 3]] },
+  // mira - Phantom + Romeo and Juliet
+  { username: 'mira', showIndex: 1, dateIndex: 2, seats: [['A', 8], ['A', 9]] },
+  { username: 'mira', showIndex: 3, dateIndex: 1, seats: [['C', 3], ['C', 4], ['C', 5]] },
+  { username: 'mira', showIndex: 3, dateIndex: 3, seats: [['E', 1], ['E', 2]] },
+  // bob - Midsummer + Nutcracker
+  { username: 'bob',   showIndex: 2, dateIndex: 0, seats: [['G', 8], ['G', 9], ['G', 10]] },
+  { username: 'bob',   showIndex: 4, dateIndex: 3, seats: [['D', 9], ['D', 10], ['D', 11]] },
+  // emma - Hamlet + Romeo and Juliet + Nutcracker
+  { username: 'emma',  showIndex: 0, dateIndex: 0, seats: [['F', 3], ['F', 4]] },
+  { username: 'emma',  showIndex: 3, dateIndex: 0, seats: [['H', 5], ['H', 6], ['H', 7]] },
+  { username: 'emma',  showIndex: 4, dateIndex: 4, seats: [['B', 1], ['B', 2]] },
 ]
 
 export async function seedIfEmpty() {

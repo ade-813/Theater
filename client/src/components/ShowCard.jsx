@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClock, faCalendarDays } from '@fortawesome/free-solid-svg-icons'
 
-function ShowCard({ show }) {
+function ShowCard({ show, index = 0 }) {
   const navigate = useNavigate()
   const dateCount = show.dates?.length ?? 0
 
@@ -17,6 +17,7 @@ function ShowCard({ show }) {
   return (
     <article
       className="show-card"
+      style={{ '--card-index': index }}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       role="button"

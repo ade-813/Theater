@@ -30,7 +30,7 @@ app.use(
 
 app.use(
   session({
-    // Fallback matches server/.env.example — required so sessions still work on a fresh clone where .env (gitignored) is absent.
+    // Fallback matches server/.env.example - required so sessions still work on a fresh clone where .env (gitignored) is absent.
     secret: process.env.SESSION_SECRET || 'theater-reservation-secret',
     resave: false,
     saveUninitialized: false

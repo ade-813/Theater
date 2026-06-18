@@ -116,11 +116,11 @@ function SeatSelection() {
   }
 
   return (
-    <div className="page-seat-selection">
+    <div className="min-vh-100 d-flex flex-column">
       {toast && <Toast toast={toast} onDismiss={() => setToast(null)} />}
 
-      <div className="seat-selection-header">
-        <button className="btn-back" onClick={() => navigate(`/shows/${showId}`)}>
+      <div className="seat-selection-header d-flex align-items-center gap-3">
+        <button className="btn-back flex-shrink-0" onClick={() => navigate(`/shows/${showId}`)}>
           <FontAwesomeIcon icon={faArrowLeft} />
           Back
         </button>
@@ -139,8 +139,9 @@ function SeatSelection() {
         )}
       </div>
 
-      <div className="seat-selection-body">
-        <aside className="ss-sidebar">
+      <div className="container-fluid p-4 flex-fill">
+        <div className="row g-3 align-items-start">
+        <aside className="col-12 col-md-4 col-xl-3 d-flex flex-column gap-3">
           <div className="card">
             <div className="card-body">
               <p className="panel-label">Legend</p>
@@ -232,7 +233,7 @@ function SeatSelection() {
           )}
         </aside>
 
-        <div className="ss-main">
+        <div className="col-12 col-md-8 col-xl-9">
           <SeatMap
             seats={seats}
             ownSeatIds={ownSeatIds}
@@ -241,7 +242,8 @@ function SeatSelection() {
           />
           <Proscenium />
         </div>
-      </div>
+        </div>{}
+      </div>{}
     </div>
   )
 }

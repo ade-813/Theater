@@ -23,7 +23,7 @@ router.get('/shows', async (req, res, next) => {
   }
 })
 
-// POST /api/admin/shows — body: { title, description?, posterUrl?, duration }
+// POST /api/admin/shows - body: { title, description?, posterUrl?, duration }
 router.post('/shows', async (req, res, next) => {
   try {
     const { title, description, posterUrl, duration } = req.body
@@ -70,7 +70,7 @@ router.delete('/shows/:id', async (req, res, next) => {
   }
 })
 
-// POST /api/admin/shows/:showId/dates — body: { date, time }
+// POST /api/admin/shows/:showId/dates - body: { date, time }
 router.post('/shows/:showId/dates', async (req, res, next) => {
   try {
     const show = await dbGet('SELECT id, duration FROM shows WHERE id = ?', [req.params.showId])
@@ -93,7 +93,7 @@ router.post('/shows/:showId/dates', async (req, res, next) => {
 
     for (const ex of existing) {
       const exStart = dayjs(`${ex.date}T${ex.time}`)
-      // If end_time is earlier than start_time the show crosses midnight — add a day
+      // If end_time is earlier than start_time the show crosses midnight - add a day
       let exEnd = dayjs(`${ex.date}T${ex.end_time}`)
       if (exEnd.isBefore(exStart)) exEnd = exEnd.add(1, 'day')
       let curEnd = newEnd
@@ -168,7 +168,7 @@ router.get('/reservations', async (req, res, next) => {
   }
 })
 
-// DELETE /api/admin/reservations/:id — admin can delete any reservation
+// DELETE /api/admin/reservations/:id - admin can delete any reservation
 router.delete('/reservations/:id', async (req, res, next) => {
   try {
     const reservation = await dbGet('SELECT id, user_id, show_date_id FROM reservations WHERE id = ?', [req.params.id])

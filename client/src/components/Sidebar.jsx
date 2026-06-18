@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faMasksTheater,
+  faHouse,
   faFilm,
   faClipboardList,
   faUser,
@@ -37,6 +38,8 @@ function Sidebar() {
   const handleLogout = () => logout().catch(() => {})
   const isActiveAdmin = user?.isAdmin && user?.isTotpVerified
 
+  const isBrowseActive = pathname === '/shows' || pathname.startsWith('/shows/')
+
   return (
     <aside className="app-sidebar">
       <Link to="/" className="sidebar-brand">
@@ -53,6 +56,14 @@ function Sidebar() {
         <Link
           to="/"
           className={`sidebar-link${pathname === '/' ? ' active' : ''}`}
+        >
+          <FontAwesomeIcon icon={faHouse} fixedWidth />
+          <span>Home</span>
+        </Link>
+
+        <Link
+          to="/shows"
+          className={`sidebar-link${isBrowseActive ? ' active' : ''}`}
         >
           <FontAwesomeIcon icon={faFilm} fixedWidth />
           <span>Browse</span>
@@ -88,7 +99,7 @@ function Sidebar() {
               {user.isAdmin && (
                 <span
                   className={`badge badge-accent${isActiveAdmin ? '' : ' opacity-50'}`}
-                  title={isActiveAdmin ? 'TOTP-verified admin' : 'Admin — not verified this session'}
+                  title={isActiveAdmin ? 'TOTP-verified admin' : 'Admin - not verified this session'}
                 >
                   <FontAwesomeIcon icon={faShield} />
                 </span>

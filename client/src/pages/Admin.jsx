@@ -310,16 +310,16 @@ function Admin() {
                     )}
 
                     {isAddingDate ? (
-                      <form className="admin-date-form" onSubmit={(e) => handleAddDate(e, show.id)}>
-                        <div className="mb-3">
+                      <form className="d-flex gap-2 align-items-end flex-wrap" onSubmit={(e) => handleAddDate(e, show.id)}>
+                        <div className="flex-fill" style={{ minWidth: 130, marginBottom: 0 }}>
                           <label className="form-label">Date</label>
                           <input type="date" className="form-control form-control-sm" value={ndDate} onChange={(e) => setNdDate(e.target.value)} required />
                         </div>
-                        <div className="mb-3">
+                        <div className="flex-fill" style={{ minWidth: 130, marginBottom: 0 }}>
                           <label className="form-label">Time</label>
                           <input type="time" className="form-control form-control-sm" value={ndTime} onChange={(e) => setNdTime(e.target.value)} required />
                         </div>
-                        <div className="d-flex gap-2 align-items-end" style={{ marginBottom: 0 }}>
+                        <div className="d-flex gap-2">
                           <button type="submit" className="btn btn-primary btn-sm" disabled={submitting}>
                             <FontAwesomeIcon icon={faPlus} className="me-1" /> Add
                           </button>
