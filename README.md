@@ -7,11 +7,11 @@ A web application for browsing shows, viewing the theater seat map, and managing
 ## Running the project
 
 ```bash
-cd server; nodemon index.mjs
+cd server; npm ci; nodemon index.mjs
 ```
 
 ```bash
-cd client; npm run dev
+cd client; npm ci; npm run dev
 ```
 
 - Client: http://localhost:5173
