@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faFilm, faCalendarDays, faPlus, faTrash, faChevronRight,
-  faClipboardList, faXmark, faClock
+  faClipboardList, faXmark, faClock, faCheck
 } from '@fortawesome/free-solid-svg-icons'
 import Toast from '../components/Toast'
 import {
@@ -26,6 +26,10 @@ function Admin() {
   const [showingNewShowForm, setShowingNewShowForm] = useState(false)
   const [addingDateForShow, setAddingDateForShow] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+
+  const [confirmDeleteShowId, setConfirmDeleteShowId] = useState(null)
+  const [confirmDeleteDate, setConfirmDeleteDate] = useState(null) // { showId, dateId }
+  const [confirmDeleteResId, setConfirmDeleteResId] = useState(null)
 
   const [nsTitle, setNsTitle] = useState('')
   const [nsDuration, setNsDuration] = useState('120')
@@ -71,11 +75,11 @@ function Admin() {
       .finally(() => setSubmitting(false))
   }
 
-  const handleDeleteShow = (show) => {
-    if (!window.confirm(`Delete "${show.title}"? This cannot be undone.`)) return
+  const handleDeleteShow = (showId, title) => {
+    setConfirmDeleteShowId(null)
     setSubmitting(true)
-    deleteShow(show.id)
-      .then(() => { showToast('success', `"${show.title}" deleted`); loadShows() })
+    deleteShow(showId)
+      .then(() => { showToast('success', `"${title}" deleted`); loadShows() })
       .catch((err) => showToast('error', err.response?.data?.error || 'Failed to delete show'))
       .finally(() => setSubmitting(false))
   }
@@ -95,8 +99,8 @@ function Admin() {
       .finally(() => setSubmitting(false))
   }
 
-  const handleDeleteDate = (showId, dateId, label) => {
-    if (!window.confirm(`Delete ${label}?`)) return
+  const handleDeleteDate = (showId, dateId) => {
+    setConfirmDeleteDate(null)
     setSubmitting(true)
     deleteShowDate(showId, dateId)
       .then(() => { showToast('success', 'Date removed'); loadShows() })
@@ -105,7 +109,7 @@ function Admin() {
   }
 
   const handleDeleteReservation = (id) => {
-    if (!window.confirm('Delete this reservation?')) return
+    setConfirmDeleteResId(null)
     setSubmitting(true)
     deleteAdminReservation(id)
       .then(() => { showToast('success', 'Reservation deleted'); loadReservations(filterDateId) })
@@ -220,15 +224,40 @@ function Admin() {
                       <span><FontAwesomeIcon icon={faClock} className="me-1" />{show.duration} min</span>
                       <span><FontAwesomeIcon icon={faCalendarDays} className="me-1" />{show.dates.length} date{show.dates.length !== 1 ? 's' : ''}</span>
                     </span>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-outline-danger ms-auto"
-                      onClick={(e) => { e.stopPropagation(); handleDeleteShow(show) }}
-                      disabled={submitting}
-                      title="Delete show"
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
+
+                    <div className="ms-auto d-flex align-items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      {confirmDeleteShowId === show.id ? (
+                        <>
+                          <span className="small text-danger fw-semibold">Delete?</span>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-danger"
+                            onClick={() => handleDeleteShow(show.id, show.title)}
+                            disabled={submitting}
+                          >
+                            <FontAwesomeIcon icon={faCheck} />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => setConfirmDeleteShowId(null)}
+                            disabled={submitting}
+                          >
+                            <FontAwesomeIcon icon={faXmark} />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => setConfirmDeleteShowId(show.id)}
+                          disabled={submitting}
+                          title="Delete show"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="card-body admin-show-body">
@@ -242,14 +271,39 @@ function Admin() {
                           <div key={d.id} className="d-flex align-items-center gap-3 px-3 py-2 rounded border">
                             <span className="fw-medium small">{fmtDate(d.date)}</span>
                             <span className="text-muted small">{d.time}–{d.endTime}</span>
-                            <button
-                              type="button"
-                              className="btn btn-sm btn-outline-danger ms-auto"
-                              onClick={() => handleDeleteDate(show.id, d.id, `${d.date} ${d.time}`)}
-                              disabled={submitting}
-                            >
-                              <FontAwesomeIcon icon={faTrash} />
-                            </button>
+
+                            <div className="ms-auto d-flex align-items-center gap-2">
+                              {confirmDeleteDate?.dateId === d.id ? (
+                                <>
+                                  <span className="small text-danger fw-semibold">Delete?</span>
+                                  <button
+                                    type="button"
+                                    className="btn btn-sm btn-danger"
+                                    onClick={() => handleDeleteDate(show.id, d.id)}
+                                    disabled={submitting}
+                                  >
+                                    <FontAwesomeIcon icon={faCheck} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-secondary"
+                                    onClick={() => setConfirmDeleteDate(null)}
+                                    disabled={submitting}
+                                  >
+                                    <FontAwesomeIcon icon={faXmark} />
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={() => setConfirmDeleteDate({ showId: show.id, dateId: d.id })}
+                                  disabled={submitting}
+                                >
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                              )}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -327,14 +381,37 @@ function Admin() {
                         <span key={s.id} className="seat-tag">{s.row}{s.number}</span>
                       ))}
                     </div>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleDeleteReservation(r.id)}
-                      disabled={submitting}
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
+
+                    {confirmDeleteResId === r.id ? (
+                      <>
+                        <span className="small text-danger fw-semibold">Delete?</span>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDeleteReservation(r.id)}
+                          disabled={submitting}
+                        >
+                          <FontAwesomeIcon icon={faCheck} />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={() => setConfirmDeleteResId(null)}
+                          disabled={submitting}
+                        >
+                          <FontAwesomeIcon icon={faXmark} />
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => setConfirmDeleteResId(r.id)}
+                        disabled={submitting}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

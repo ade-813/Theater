@@ -37,8 +37,8 @@ router.delete('/current', isLoggedIn, (req, res, next) => {
 });
 router.post('/totp', isLoggedIn, (req, res) => {
   if (!req.user.totp_secret) return res.status(400).json({ error: 'TOTP not enabled for this user' })
-  const { valid } = verifySync({ secret: req.user.totp_secret, token: req.body.code })
-  if (!valid) return res.status(401).json({ error: 'Invalid TOTP code' })
+  const isValid = verifySync({ secret: req.user.totp_secret, token: req.body.code, type: 'totp' })
+  if (!isValid) return res.status(401).json({ error: 'Invalid TOTP code' })
   req.session.totpVerified = true
   res.json(userView(req))
 })

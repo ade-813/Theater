@@ -171,8 +171,20 @@ router.get('/reservations', async (req, res, next) => {
 // DELETE /api/admin/reservations/:id — admin can delete any reservation
 router.delete('/reservations/:id', async (req, res, next) => {
   try {
-    const reservation = await dbGet('SELECT id FROM reservations WHERE id = ?', [req.params.id])
+    const reservation = await dbGet('SELECT id, user_id, show_date_id FROM reservations WHERE id = ?', [req.params.id])
     if (!reservation) return res.status(404).json({ error: 'Reservation not found' })
+
+    const seats = await dbAll(
+      `SELECT s.id FROM reservation_seats rs JOIN seats s ON s.id = rs.seat_id WHERE rs.reservation_id = ?`,
+      [reservation.id]
+    )
+    const releasedAt = dayjs().toISOString()
+    for (const seat of seats)
+      await dbRun(
+        'INSERT OR REPLACE INTO seat_cooldowns (seat_id, user_id, show_date_id, released_at) VALUES (?, ?, ?, ?)',
+        [seat.id, reservation.user_id, reservation.show_date_id, releasedAt]
+      )
+
     await dbRun('DELETE FROM reservation_seats WHERE reservation_id = ?', [reservation.id])
     await dbRun('DELETE FROM reservations WHERE id = ?', [reservation.id])
     res.sendStatus(204)

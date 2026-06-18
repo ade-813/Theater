@@ -1,4 +1,4 @@
-Student: s000000 LASTNAME FIRSTNAME
+Student: s353229 DUKA ADEA
 
 # Theater — seat reservation app
 
