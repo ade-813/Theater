@@ -2,13 +2,4 @@
 
 @import './tokens.css';
 @import './animations.css';
-@import './base.css';
-@import './shell.css';
-@import './sidebar.css';
-@import './layout.css';
-@import './proscenium.css';
-@import './forms.css';
-@import './feedback.css';
-@import './seats.css';
-@import './reservations.css';
-@import './login.css';
+@import './overrides.css';

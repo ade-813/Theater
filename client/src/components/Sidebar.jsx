@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faMasksTheater,
-  faMap,
+  faFilm,
   faClipboardList,
   faUser,
   faArrowRightFromBracket,
@@ -20,14 +20,18 @@ function Sidebar() {
 
   const [isDark, setIsDark] = useState(() => {
     const stored = localStorage.getItem('theme')
-    const dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+    const dark = stored ? stored === 'dark' : true
+    const theme = dark ? 'dark' : 'light'
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.setAttribute('data-bs-theme', theme)
     return dark
   })
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
-    localStorage.setItem('theme', isDark ? 'dark' : 'light')
+    const theme = isDark ? 'dark' : 'light'
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.setAttribute('data-bs-theme', theme)
+    localStorage.setItem('theme', theme)
   }, [isDark])
 
   const handleLogout = () => logout().catch(() => {})
@@ -46,10 +50,14 @@ function Sidebar() {
       </Link>
 
       <nav className="sidebar-nav">
-        <Link to="/" className={`sidebar-link${pathname === '/' ? ' active' : ''}`}>
-          <FontAwesomeIcon icon={faMap} fixedWidth />
-          <span>Seat map</span>
+        <Link
+          to="/"
+          className={`sidebar-link${pathname === '/' ? ' active' : ''}`}
+        >
+          <FontAwesomeIcon icon={faFilm} fixedWidth />
+          <span>Browse</span>
         </Link>
+
         {!loading && user && (
           <Link
             to="/reservations"
@@ -57,6 +65,16 @@ function Sidebar() {
           >
             <FontAwesomeIcon icon={faClipboardList} fixedWidth />
             <span>{isActiveAdmin ? 'Manage reservations' : 'My reservations'}</span>
+          </Link>
+        )}
+
+        {!loading && isActiveAdmin && (
+          <Link
+            to="/admin"
+            className={`sidebar-link${pathname === '/admin' ? ' active' : ''}`}
+          >
+            <FontAwesomeIcon icon={faShield} fixedWidth />
+            <span>Admin</span>
           </Link>
         )}
       </nav>
@@ -69,7 +87,7 @@ function Sidebar() {
               <span className="sidebar-user-name">{user.name}</span>
               {user.isAdmin && (
                 <span
-                  className={`badge ${isActiveAdmin ? 'badge-accent' : ''}`}
+                  className={`badge badge-accent${isActiveAdmin ? '' : ' opacity-50'}`}
                   title={isActiveAdmin ? 'TOTP-verified admin' : 'Admin — not verified this session'}
                 >
                   <FontAwesomeIcon icon={faShield} />
@@ -87,7 +105,7 @@ function Sidebar() {
             className={`sidebar-action${pathname === '/login' ? ' active' : ''}`}
           >
             <FontAwesomeIcon icon={faArrowRightToBracket} fixedWidth />
-            <span>Login</span>
+            <span>Sign in</span>
           </Link>
         )}
         <button

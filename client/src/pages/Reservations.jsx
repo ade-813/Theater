@@ -1,8 +1,9 @@
 import { useContext, useEffect, useMemo, useState } from 'react'
 import SeatMap from '../components/SeatMap'
 import SeatLegend from '../components/SeatLegend'
-import ReservationItem from '../components/ReservationItem'
+import ReservationCard from '../components/ReservationCard'
 import Proscenium from '../components/Proscenium'
+import Toast from '../components/Toast'
 import { AuthContext } from '../context/AuthContext'
 import { getSeats } from '../api/seats'
 import { getReservations, updateReservation, deleteReservation } from '../api/reservations'
@@ -23,8 +24,7 @@ function Reservations() {
   const [reservations, setReservations] = useState([])
   const [users, setUsers] = useState([])
   const [viewedUserId, setViewedUserId] = useState(user.id)
-  const [error, setError] = useState('')
-  const [feedback, setFeedback] = useState(null)
+  const [toast, setToast] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [selectedSeatIds, setSelectedSeatIds] = useState(new Set())
   const [removeSeatIds, setRemoveSeatIds] = useState(new Set())
@@ -33,13 +33,18 @@ function Reservations() {
 
   const canManageOthers = user.isAdmin && user.isTotpVerified
 
+  const showToast = (type, text) => {
+    setToast({ type, text })
+    setTimeout(() => setToast(null), 4000)
+  }
+
   useEffect(() => {
-    getSeats().then(setSeats).catch(() => setError('Unable to load the seat map'))
+    getSeats().then(setSeats).catch(() => {})
   }, [])
 
   useEffect(() => {
     if (!canManageOthers) return
-    getUsers().then(setUsers).catch(() => setUsers([]))
+    getUsers().then(setUsers).catch(() => {})
   }, [canManageOthers])
 
   useEffect(() => {
@@ -49,7 +54,7 @@ function Reservations() {
   }, [viewedUserId, user.id])
 
   const refresh = () => {
-    getSeats().then(setSeats).catch(() => setError('Unable to load the seat map'))
+    getSeats().then(setSeats).catch(() => {})
     getReservations(viewedUserId === user.id ? undefined : viewedUserId)
       .then(setReservations)
       .catch(() => setReservations([]))
@@ -57,34 +62,32 @@ function Reservations() {
 
   const reservationMarkers = useMemo(() => {
     const markers = new Map()
-    reservations.forEach((reservation, index) => {
-      for (const seat of reservation.seats) markers.set(seat.id, index % MARKER_COUNT)
+    reservations.forEach((r, i) => {
+      for (const seat of r.seats) markers.set(seat.id, i % MARKER_COUNT)
     })
     return markers
   }, [reservations])
 
   const removableSeatIds = useMemo(() => {
     const ids = new Set()
-    const reservation = reservations.find((r) => r.id === editingId)
-    if (reservation) for (const seat of reservation.seats) ids.add(seat.id)
+    const r = reservations.find((r) => r.id === editingId)
+    if (r) for (const seat of r.seats) ids.add(seat.id)
     return ids
   }, [editingId, reservations])
 
   const handleSeatClick = (seat) => {
-    if (removableSeatIds.has(seat.id)) setRemoveSeatIds((current) => toggleId(current, seat.id))
-    else if (seat.status === 'available') setSelectedSeatIds((current) => toggleId(current, seat.id))
+    if (removableSeatIds.has(seat.id))
+      setRemoveSeatIds((cur) => toggleId(cur, seat.id))
+    else if (seat.status === 'available' || !seat.status)
+      setSelectedSeatIds((cur) => toggleId(cur, seat.id))
   }
 
-  const handleActionError = (err, fallback) => {
-    setFeedback({ type: 'error', text: err.response?.data?.error || fallback })
-  }
-
-  const startEdit = (reservationId) => {
-    setEditingId(reservationId)
+  const startEdit = (id) => {
+    setEditingId(id)
     setSelectedSeatIds(new Set())
     setRemoveSeatIds(new Set())
     setConfirmDeleteId(null)
-    setFeedback(null)
+    setToast(null)
   }
 
   const cancelEdit = () => {
@@ -94,18 +97,20 @@ function Reservations() {
   }
 
   const handleSaveEdit = () => {
-    if (selectedSeatIds.size === 0 && removeSeatIds.size === 0) {
-      cancelEdit()
-      return
-    }
+    if (selectedSeatIds.size === 0 && removeSeatIds.size === 0) { cancelEdit(); return }
     setSubmitting(true)
-    updateReservation(editingId, { addSeatIds: [...selectedSeatIds], removeSeatIds: [...removeSeatIds] })
+    updateReservation(editingId, {
+      addSeatIds: [...selectedSeatIds],
+      removeSeatIds: [...removeSeatIds],
+    })
       .then(() => {
-        setFeedback({ type: 'success', text: 'Reservation updated' })
+        showToast('success', 'Reservation updated')
         cancelEdit()
         refresh()
       })
-      .catch((err) => handleActionError(err, 'Unable to update the reservation'))
+      .catch((err) =>
+        showToast('error', err.response?.data?.error || 'Unable to update reservation')
+      )
       .finally(() => setSubmitting(false))
   }
 
@@ -113,79 +118,87 @@ function Reservations() {
     setSubmitting(true)
     deleteReservation(id)
       .then(() => {
-        setFeedback({ type: 'success', text: 'Reservation deleted' })
+        showToast('success', 'Reservation deleted')
         setConfirmDeleteId(null)
         if (editingId === id) cancelEdit()
         refresh()
       })
-      .catch((err) => handleActionError(err, 'Unable to delete the reservation'))
+      .catch((err) =>
+        showToast('error', err.response?.data?.error || 'Unable to delete reservation')
+      )
       .finally(() => setSubmitting(false))
   }
 
-  const handleUserChange = (event) => {
-    setViewedUserId(Number(event.target.value))
+  const handleUserChange = (e) => {
+    setViewedUserId(Number(e.target.value))
     cancelEdit()
     setConfirmDeleteId(null)
-    setFeedback(null)
+    setToast(null)
   }
 
   return (
-    <main className="page page-wide">
+    <main className="page-wide">
+      {toast && <Toast toast={toast} onDismiss={() => setToast(null)} />}
+
       <h1>{canManageOthers ? 'Manage reservations' : 'My reservations'}</h1>
 
-      {error && <p className="alert alert-error">{error}</p>}
-      {feedback && (
-        <p className={`alert ${feedback.type === 'error' ? 'alert-error' : 'alert-success'}`}>
-          {feedback.text}
-        </p>
+      {canManageOthers && (
+        <div className="card mb-4" style={{ maxWidth: 340 }}>
+          <div className="card-body py-3">
+            <p className="panel-label">Viewing</p>
+            <select
+              id="user-picker"
+              className="form-select form-select-sm"
+              value={viewedUserId}
+              onChange={handleUserChange}
+            >
+              <option value={user.id}>{user.name} (you)</option>
+              {users.filter((u) => u.id !== user.id).map((u) => (
+                <option key={u.id} value={u.id}>{u.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
       )}
 
-      <div className="layout">
-        <aside className="sidebar">
-          {canManageOthers && (
-            <div className="panel">
-              <h2 className="panel-title">Admin — viewing</h2>
-              <div className="field">
-                <label htmlFor="user-picker">Reservations for</label>
-                <select id="user-picker" value={viewedUserId} onChange={handleUserChange}>
-                  <option value={user.id}>{user.name} (you)</option>
-                  {users.filter((u) => u.id !== user.id).map((u) => (
-                    <option key={u.id} value={u.id}>{u.name}</option>
-                  ))}
-                </select>
+      {editingId !== null && (
+        <div className="page-layout mb-2">
+          <aside className="page-layout-sidebar">
+            <div className="card">
+              <div className="card-body">
+                <p className="panel-label">Legend</p>
+                <SeatLegend showEditing />
               </div>
             </div>
-          )}
-
-          <div className="panel">
-            <h2 className="panel-title">Legend</h2>
-            <SeatLegend showEditing={editingId !== null} />
-          </div>
-
-          {editingId !== null && (
-            <div className="panel">
-              <h2 className="panel-title">Editing #{editingId}</h2>
-              <p className="text-muted">
-                {selectedSeatIds.size > 0 || removeSeatIds.size > 0
-                  ? `+${selectedSeatIds.size} to add · −${removeSeatIds.size} to remove`
-                  : 'Click a seat to remove it or click an available seat to add.'}
-              </p>
+            <div className="card">
+              <div className="card-body">
+                <p className="panel-label">Edit mode</p>
+                <p className="text-muted small mb-0">
+                  {selectedSeatIds.size > 0 || removeSeatIds.size > 0
+                    ? `+${selectedSeatIds.size} to add · −${removeSeatIds.size} to remove`
+                    : 'Click reserved seats to remove, available to add.'}
+                </p>
+              </div>
             </div>
-          )}
-        </aside>
+          </aside>
 
-        <div className="main-panel">
-          <SeatMap
-            seats={seats}
-            reservationMarkers={reservationMarkers}
-            removableSeatIds={removableSeatIds}
-            pendingRemoveSeatIds={removeSeatIds}
-            selectedSeatIds={selectedSeatIds}
-            onSeatClick={editingId !== null ? handleSeatClick : undefined}
-          />
-          <Proscenium />
+          <div className="page-layout-main">
+            <div className="card">
+              <div className="card-body">
+                <SeatMap
+                  seats={seats}
+                  reservationMarkers={reservationMarkers}
+                  removableSeatIds={removableSeatIds}
+                  pendingRemoveSeatIds={removeSeatIds}
+                  selectedSeatIds={selectedSeatIds}
+                  onSeatClick={handleSeatClick}
+                />
+                <Proscenium />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="reservation-section">
         {reservations.length === 0 ? (
@@ -195,17 +208,17 @@ function Reservations() {
             <p className="reservation-section-title">
               {reservations.length} reservation{reservations.length !== 1 ? 's' : ''}
             </p>
-            <ul className="reservation-list">
-              {reservations.map((reservation, index) => (
-                <ReservationItem
-                  key={reservation.id}
-                  reservation={reservation}
-                  index={index}
+            <ul className="reservation-cards">
+              {reservations.map((r, i) => (
+                <ReservationCard
+                  key={r.id}
+                  reservation={r}
+                  index={i}
                   editingId={editingId}
                   confirmDeleteId={confirmDeleteId}
                   submitting={submitting}
-                  selectedSeatIds={selectedSeatIds}
-                  removeSeatIds={removeSeatIds}
+                  selectedSeatIds={editingId === r.id ? selectedSeatIds : new Set()}
+                  removeSeatIds={editingId === r.id ? removeSeatIds : new Set()}
                   onEdit={startEdit}
                   onCancelEdit={cancelEdit}
                   onSaveEdit={handleSaveEdit}

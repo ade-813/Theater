@@ -56,90 +56,103 @@ function Login() {
   return (
     <div className="page-login">
       <div className="login-box">
-        <div className="login-emblem">
-          <FontAwesomeIcon icon={faMasksTheater} />
+        <div className="card border-0 shadow-lg p-4 p-md-5">
+          <div className="card-body p-0">
+            <div className="login-emblem">
+              <FontAwesomeIcon icon={faMasksTheater} />
+            </div>
+
+            <p className="login-eyebrow">{eyebrow}</p>
+            <h1>{heading}</h1>
+
+            {error && (
+              <div className="alert alert-danger py-2 small" role="alert">
+                {error}
+              </div>
+            )}
+
+            {step === 'credentials' && (
+              <form onSubmit={handleCredentialsSubmit}>
+                <div className="mb-3">
+                  <label htmlFor="username" className="form-label">Username</label>
+                  <input
+                    id="username"
+                    type="text"
+                    className="form-control"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    autoFocus
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label htmlFor="password" className="form-label">Password</label>
+                  <input
+                    id="password"
+                    type="password"
+                    className="form-control"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="d-grid mt-4">
+                  <button type="submit" className="btn btn-primary">
+                    <FontAwesomeIcon icon={faRightToBracket} className="me-2" />
+                    Sign in
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {step === 'adminChoice' && (
+              <>
+                <p className="text-muted small">
+                  Your account has admin privileges. Proceeding as admin requires a one-time TOTP code from your authenticator.
+                </p>
+                <div className="d-grid gap-2 mt-3">
+                  <button type="button" className="btn btn-primary" onClick={() => setStep('totp')}>
+                    <FontAwesomeIcon icon={faShield} className="me-2" />
+                    Proceed as admin
+                  </button>
+                  <button type="button" className="btn btn-outline-secondary" onClick={() => navigate('/')}>
+                    <FontAwesomeIcon icon={faArrowRight} className="me-2" />
+                    Continue as regular user
+                  </button>
+                </div>
+              </>
+            )}
+
+            {step === 'totp' && (
+              <form onSubmit={handleTotpSubmit}>
+                <div className="login-divider">One-time code</div>
+                <div className="mb-3">
+                  <label htmlFor="code" className="form-label">TOTP code</label>
+                  <input
+                    id="code"
+                    type="text"
+                    className="form-control"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    autoFocus
+                    required
+                  />
+                </div>
+                <div className="d-grid gap-2 mt-3">
+                  <button type="submit" className="btn btn-primary">
+                    <FontAwesomeIcon icon={faShield} className="me-2" />
+                    Verify
+                  </button>
+                  <button type="button" className="btn btn-outline-secondary" onClick={() => navigate('/')}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
         </div>
-
-        <p className="login-eyebrow">{eyebrow}</p>
-        <h1>{heading}</h1>
-
-        {error && <p className="alert alert-error">{error}</p>}
-
-        {step === 'credentials' && (
-          <form onSubmit={handleCredentialsSubmit}>
-            <div className="field">
-              <label htmlFor="username">Username</label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                autoFocus
-                required
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="password">Password</label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <button type="submit" className="btn btn-primary">
-              <FontAwesomeIcon icon={faRightToBracket} />
-              Sign in
-            </button>
-          </form>
-        )}
-
-        {step === 'adminChoice' && (
-          <>
-            <p className="text-muted">
-              Your account has admin privileges. Proceed as admin requires a one-time TOTP code from your authenticator.
-            </p>
-            <div className="btn-row">
-              <button type="button" className="btn btn-primary" onClick={() => setStep('totp')}>
-                <FontAwesomeIcon icon={faShield} />
-                Proceed as admin
-              </button>
-              <button type="button" className="btn" onClick={() => navigate('/')}>
-                <FontAwesomeIcon icon={faArrowRight} />
-                Continue as regular user
-              </button>
-            </div>
-          </>
-        )}
-
-        {step === 'totp' && (
-          <form onSubmit={handleTotpSubmit}>
-            <div className="login-divider">One-time code</div>
-            <div className="field">
-              <label htmlFor="code">TOTP code</label>
-              <input
-                id="code"
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                autoFocus
-                required
-              />
-            </div>
-            <div className="btn-row">
-              <button type="submit" className="btn btn-primary">
-                <FontAwesomeIcon icon={faShield} />
-                Verify
-              </button>
-              <button type="button" className="btn" onClick={() => navigate('/')}>
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
       </div>
     </div>
   )

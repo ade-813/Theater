@@ -107,11 +107,11 @@
   --color-danger-soft:      rgba(176, 72, 72, 0.12);
 
   /* Seats */
-  --color-seat-available:        #1a1814;
-  --color-seat-available-border: #342f26;
-  --color-seat-reserved:         #110f0c;
-  --color-seat-reserved-border:  #221e18;
-  --color-seat-own:              rgba(200, 169, 110, 0.12);
+  --color-seat-available:        #2e2820;
+  --color-seat-available-border: #4e4235;
+  --color-seat-reserved:         #171310;
+  --color-seat-reserved-border:  #2a241c;
+  --color-seat-own:              rgba(200, 169, 110, 0.16);
   --color-seat-own-border:       #c8a96e;
   --color-seat-premium-accent:   #c8a96e;
 

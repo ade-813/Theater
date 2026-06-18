@@ -1,8 +1,10 @@
 import api from './api'
 
-const getSeats = async () => {
-  const response = await api.get('/seats')
-  return response.data
+const getSeats = async (showDateId) => {
+  const { data } = await api.get('/seats', {
+    params: showDateId ? { showDateId } : {}
+  })
+  return data
 }
 
 export { getSeats }
